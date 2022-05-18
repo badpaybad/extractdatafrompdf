@@ -12,38 +12,39 @@ namespace PdfExtractor.Domains
 {
     public class TesseractEngineWrapper
     {
-        static ConcurrentDictionary<string, TesseractEngine> _engine= new ConcurrentDictionary<string, TesseractEngine>();
-        
-        public string TryFindText(byte [] byteStream, string lang = "eng")
-        {
-            var folderData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-                string ocrtext = string.Empty;
+        static ConcurrentDictionary<string, TesseractEngine> _engine = new ConcurrentDictionary<string, TesseractEngine>();
 
-            if(!_engine.TryGetValue(lang, out var _tesseractEngine))
+        public string TryFindText(byte[] byteStream, string lang = "eng")
+        {
+            using (var bmp = new Bitmap(new MemoryStream(byteStream)))
             {
-                _tesseractEngine =  new TesseractEngine(folderData, lang);
-                _engine.TryAdd(lang, _tesseractEngine);
+                return TryFindText(bmp, lang);
+            }
+        }
+
+        public string TryFindText(Bitmap bmp, string lang = "eng")
+        {            
+            string ocrtext = string.Empty;
+
+            if (!_engine.TryGetValue(lang, out var tesseractEngine))
+            {
+                var folderData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+                tesseractEngine = new TesseractEngine(folderData, lang);
+                _engine.TryAdd(lang, tesseractEngine);
             }
 
-            //using (TesseractEngine _tesseractEngine = new TesseractEngine(folderData, lang))
-            //{
-                using (var xxx = new MemoryStream())
-                {
-                    using (var bmp = new Bitmap(new MemoryStream(byteStream)))
-                    {
-                        bmp.Save(xxx, System.Drawing.Imaging.ImageFormat.Tiff);
+            using (var xxx = new MemoryStream())
+            {
+                bmp.Save(xxx, System.Drawing.Imaging.ImageFormat.Tiff);
 
-                        using (Pix pix = Pix.LoadTiffFromMemory(xxx.ToArray()))                        
-                        {
-                            using (var page = _tesseractEngine.Process(pix))
-                            {
-                                ocrtext = page.GetText();
-                            }
-                            //pix.Save(fileImage + ".png", ImageFormat.Png);
-                        }
-                    }                       
-                }                    
-            //}
+                using (Pix pix = Pix.LoadTiffFromMemory(xxx.ToArray()))
+                {
+                    using (var page = tesseractEngine.Process(pix))
+                    {
+                        ocrtext = page.GetText();
+                    }
+                }
+            }
 
             return ocrtext;
         }

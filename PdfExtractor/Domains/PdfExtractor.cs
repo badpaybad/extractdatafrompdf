@@ -23,17 +23,21 @@ using System.Threading.Tasks;
 
 namespace PdfExtractor.Domains
 {
+    public class MyPdfPage
+    {
+        public int PageIndex { get; set; }
+        public string ContentText { get; set; } = String.Empty;
+        public List<MemoryStream> ContentImages { get; set; } = new List<MemoryStream>();
+
+        public byte[]? PageBytes { get; set; }
+        public MemoryStream? PageStream { get; set; }
+
+        public Bitmap? PageImage { get; set; } 
+    }
+
     public class PdfExtractor
     {
-        public class MyPdfPage
-        {
-            public int PageIndex { get; set; }
-            public string RawText { get; set; } = String.Empty;
-            public List<MemoryStream> Images { get; set; }= new List<MemoryStream>();
-
-            public MemoryStream PreviewImage { get; set; }= new MemoryStream();
-        }
-
+       
         public class PdfInfo
         {
             public int TotalPage { get; set; }
@@ -129,9 +133,9 @@ namespace PdfExtractor.Domains
 
                         MyPdfPage item = new MyPdfPage
                         {
-                            Images = eventListener.GetImages(),
+                            ContentImages = eventListener.GetImages(),
                             PageIndex = i - 1,
-                            RawText = eventListener.GetText(),
+                            ContentText = eventListener.GetText(),
 
                         };
                         pages.Add(item);

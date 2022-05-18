@@ -24,8 +24,7 @@ namespace PdfExtractor
 
            var x= new PdfToImageProcessing(testpdf);
 
-             x.ConvertToImage();
-            x.GetText();
+            x.Parse();
 
             ////
 

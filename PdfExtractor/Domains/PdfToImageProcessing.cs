@@ -11,36 +11,43 @@ namespace PdfExtractor.Domains
     {
         string _filepdf = string.Empty;
 
-        List<byte[]> _images = new List<byte[]>();
         TesseractEngineWrapper _ocr;
 
+        List<MyPdfPage> _pages = new List<MyPdfPage>();
+        int _threadConsume = 1;
         public PdfToImageProcessing(string filePdf)
         {
+            _threadConsume = (Environment.ProcessorCount * 2) / 3 + 1;
+
             _filepdf = filePdf;
 
-            _ocr = new TesseractEngineWrapper();           
+            _ocr = new TesseractEngineWrapper();
         }
 
-        public void ConvertToImage()
+        public void Parse()
         {
-            _images = Freeware.Pdf2Png.ConvertAllPages(File.OpenRead(_filepdf));
-        }
+            _pages = Freeware.Pdf2Png.ConvertAllPages(File.OpenRead(_filepdf))
+                .Select((i, idx) =>
+                {
+                    var p = new MyPdfPage
+                    {
+                        PageBytes = i,
+                        PageIndex = idx,
+                        ContentImages = new List<MemoryStream>(),
+                    };
+                    return p;
+                }).OrderBy(i => i.PageIndex).ToList();
 
-        public void GetText()
-        {
-            List<string> text = new List<string>();
-
-            //Parallel.ForEach(_images, img =>
-            //{
-            //    var xxx = _ocr.TryFindText(img, "vie");
-            //    text.Add(xxx);
-            //});
-
-            foreach(var img in _images)
+            Parallel.ForEach(_pages, new ParallelOptions { MaxDegreeOfParallelism = _threadConsume },
+                p =>
             {
-                var xxx = _ocr.TryFindText(img, "vie");
-                text.Add(xxx);
-            }
+                if (p.PageBytes == null) return;
+
+                var ps = new MemoryStream(p.PageBytes);
+                p.PageStream = ps;
+                p.PageImage = new System.Drawing.Bitmap(ps);
+                p.ContentText = _ocr.TryFindText(p.PageImage, "vie");
+            });
         }
 
     }
