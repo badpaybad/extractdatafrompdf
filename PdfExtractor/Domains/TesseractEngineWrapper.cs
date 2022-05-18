@@ -12,7 +12,14 @@ namespace PdfExtractor.Domains
 {
     public class TesseractEngineWrapper
     {
-        static ConcurrentDictionary<string, TesseractEngine> _engine = new ConcurrentDictionary<string, TesseractEngine>();
+        //static ConcurrentDictionary<string, TesseractEngine> _engine = new ConcurrentDictionary<string, TesseractEngine>();
+        
+        string folderData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+
+        public TesseractEngineWrapper()
+        {
+
+        }
 
         public string TryFindText(byte[] byteStream, string lang = "eng")
         {
@@ -23,16 +30,16 @@ namespace PdfExtractor.Domains
         }
 
         public string TryFindText(Bitmap bmp, string lang = "eng")
-        {            
+        {
             string ocrtext = string.Empty;
 
-            if (!_engine.TryGetValue(lang, out var tesseractEngine))
-            {
-                var folderData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-                tesseractEngine = new TesseractEngine(folderData, lang);
-                _engine.TryAdd(lang, tesseractEngine);
-            }
-
+            //if (!_engine.TryGetValue(lang, out var tesseractEngine))
+            //{
+            // 
+            //    tesseractEngine = new TesseractEngine(folderData, lang);
+            //    _engine.TryAdd(lang, tesseractEngine);
+            //}
+            using (var tesseractEngine = new TesseractEngine(folderData, lang))
             using (var xxx = new MemoryStream())
             {
                 bmp.Save(xxx, System.Drawing.Imaging.ImageFormat.Tiff);
