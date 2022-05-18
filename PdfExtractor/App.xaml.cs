@@ -20,7 +20,7 @@ namespace PdfExtractor
         {
             base.OnStartup(e);
 
-            var testpdf = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf");
+            var testpdf = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "4.pdf");
 
            var x= new PdfToImageProcessing(testpdf);
 
