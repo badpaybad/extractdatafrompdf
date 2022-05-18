@@ -30,11 +30,17 @@ namespace PdfExtractor.Domains
         {
             List<string> text = new List<string>();
 
-            Parallel.ForEach(_images, img =>
+            //Parallel.ForEach(_images, img =>
+            //{
+            //    var xxx = _ocr.TryFindText(img, "vie");
+            //    text.Add(xxx);
+            //});
+
+            foreach(var img in _images)
             {
                 var xxx = _ocr.TryFindText(img, "vie");
                 text.Add(xxx);
-            });
+            }
         }
 
     }
