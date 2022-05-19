@@ -39,21 +39,29 @@ namespace PdfExtractor.Domains
         {
             get
             {
-                if(PageImage == null) return null;
-
-                using (MemoryStream memory = new MemoryStream())
+                try
                 {
-                    Bitmap thumb= new Bitmap(PageImage,120,(int) 120*PageImage.Height/ PageImage.Width);
 
-                    thumb.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                    memory.Position = 0;
-                    BitmapImage bitmapimage = new BitmapImage();
-                    bitmapimage.BeginInit();
-                    bitmapimage.StreamSource = memory;
-                    bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapimage.EndInit();
+                    if (PageImage == null) return null;
 
-                    return bitmapimage;
+                    using (MemoryStream memory = new MemoryStream())
+                    {
+                        Bitmap thumb = new Bitmap(PageImage, 120, (int)120 * PageImage.Height / PageImage.Width);
+
+                        thumb.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                        memory.Position = 0;
+                        BitmapImage bitmapimage = new BitmapImage();
+                        bitmapimage.BeginInit();
+                        bitmapimage.StreamSource = memory;
+                        bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmapimage.EndInit();
+
+                        return bitmapimage;
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
                 }
             }
         }

@@ -58,6 +58,8 @@ namespace PdfExtractor.Domains
 
         public List<MyPdfPage> Prepare()
         {
+            if(ParseStep>0) return _pages;
+
             ParseStep = 0;
             _pages = Freeware.Pdf2Png.ConvertAllPages(File.OpenRead(_filepdf))
                 .Select((i, idx) =>
@@ -82,6 +84,8 @@ namespace PdfExtractor.Domains
 
         public void Parse()
         {
+            if (ParseStep > 1) return;
+
             List<int> pres = new List<int> { };
 
             Parallel.ForEach(_pages, new ParallelOptions { MaxDegreeOfParallelism = _threadConsume },

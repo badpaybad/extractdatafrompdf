@@ -31,6 +31,7 @@
                 <Button Grid.Column="1" x:Name="btnChangeFolder" Content="Change folder"  Click="btnChangeFolder_Click"/>
             </Grid>
             <ListView x:Name="lsvFiles" Grid.Row="1" >
+                
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="200" Header="File name" DisplayMemberBinding="{Binding Path=FileName}"  />

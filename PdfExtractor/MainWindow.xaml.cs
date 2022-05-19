@@ -83,6 +83,27 @@ namespace PdfExtractor
                     _currentPdf = itm;
 
                     this.BindCurrentPdfPreview();
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        txtPdfContentText.Text = "PARSING ...";
+                    });                    
+
+                    var _ = Task.Run(() => {
+                        _currentPdf.Parse();
+
+                        this.BindFilesToListView();
+                        this.BindCurrentPdfPreview();
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            btnTryParse.Content = "Try parse";
+
+                            txtPdfContentText.Text = String.Join("\r\n\r\n", _currentPdf.Pages.Select(i => i.ContentText));
+                        });
+
+                    });
+                    
                 });
 
             }
