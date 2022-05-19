@@ -26,7 +26,10 @@ namespace PdfExtractor
             InitializeComponent();
 
             lsvFiles.SelectionChanged += LsvFiles_SelectionChanged;
-        }   
+            //https://docs.google.com/spreadsheets/d/1Q3yQxR7sVtrCBa_HurPo8Ur2XSveaelMf7eZdDDeWDE/edit#gid=0
+        }
+
+        PdfToImageProcessing _currentPdf;
 
         private void LsvFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -37,6 +40,20 @@ namespace PdfExtractor
                 var _ = Task.Run(() => {
                     itm.Prepare();                    
                     this.BindFilesToListView();
+                    
+                    _currentPdf = itm;
+
+                    Dispatcher.Invoke(() => { 
+                        lblCurrentPdf.Content = itm.FileName;
+                        lblCurrentPdfParseStatus.Content = itm.ParseStepText;
+                        lblCurrentPdfUploadStatus.Content = itm.UploadStateText;
+
+                        lsvCurrentPdf.Items.Clear();
+                        foreach(var p in _currentPdf.Pages)
+                        {
+                            lsvCurrentPdf.Items.Add(p);
+                        }
+                    });
                 });
                 
             }

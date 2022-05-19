@@ -20,6 +20,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace PdfExtractor.Domains
 {
@@ -33,6 +34,30 @@ namespace PdfExtractor.Domains
         public MemoryStream? PageStream { get; set; }
 
         public Bitmap? PageImage { get; set; } 
+
+        public System.Windows.Media.Imaging.BitmapImage? PageBitmapData
+        {
+            get
+            {
+                if(PageImage == null) return null;
+
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    Bitmap thumb= new Bitmap(PageImage,120,(int) 120*PageImage.Height/ PageImage.Width);
+
+                    thumb.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                    memory.Position = 0;
+                    BitmapImage bitmapimage = new BitmapImage();
+                    bitmapimage.BeginInit();
+                    bitmapimage.StreamSource = memory;
+                    bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapimage.EndInit();
+
+                    return bitmapimage;
+                }
+            }
+        }
+                
     }
 
     public class PdfExtractor
