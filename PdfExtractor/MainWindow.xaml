@@ -7,126 +7,157 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="576" Width="1024">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="35*">
-            </ColumnDefinition>
-            <ColumnDefinition Width="25*">
-            </ColumnDefinition>
-            <ColumnDefinition Width="40*">
-            </ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions >
-                <RowDefinition Height="10*"></RowDefinition>
-                <RowDefinition Height="90*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70*"></ColumnDefinition>
-                    <ColumnDefinition Width="30*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <TextBox x:Name="txtFolder" HorizontalAlignment="Left"  TextWrapping="Wrap" 
-                         Grid.Column="0" >
-                </TextBox>
-                <Button Grid.Column="1" x:Name="btnChangeFolder" Content="Change folder"  Click="btnChangeFolder_Click"/>
-            </Grid>
-            <ListView x:Name="lsvFiles" Grid.Row="1" >
-                
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="200" Header="File name" DisplayMemberBinding="{Binding Path=FileName}"  />
-                        <GridViewColumn  Width="70" Header="Parse" DisplayMemberBinding="{Binding Path=ParseStepText}"/>
-                        <GridViewColumn  Width="70" Header="Upload" DisplayMemberBinding="{Binding Path=UploadStateText}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-        </Grid>
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="20*"></RowDefinition>
-                <RowDefinition Height="80*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"></RowDefinition>
+            <RowDefinition Height="92*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ToolBar Grid.Row="0">
+            <Button Content="Logo - Company name"/>
+            <Separator/>
+            <Button Content="View logs"/>
+            <Separator/>
+            <Button Content="Retry parse failed"/>
+            <Separator/>
+            <Button Content="Retry upload failed"/>
+        </ToolBar>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="35*">
+                </ColumnDefinition>
+                <ColumnDefinition Width="25*">
+                </ColumnDefinition>
+                <ColumnDefinition Width="40*">
+                </ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions >
+                    <RowDefinition Height="10*"></RowDefinition>
+                    <RowDefinition Height="90*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Name="lblCurrentPdf" Content="Current pdf"></Label>
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="70*"></ColumnDefinition>
+                        <ColumnDefinition Width="30*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0" Content="Parse"></Label>
-                    <Label Grid.Column="1" Content="Parse status" Name="lblCurrentPdfParseStatus"></Label>
+                    <TextBox x:Name="txtFolder" HorizontalAlignment="Left"  TextWrapping="Wrap" 
+                         Grid.Column="0" >
+                    </TextBox>
+                    <Button Grid.Column="1" x:Name="btnChangeFolder" Content="Change folder"  Click="btnChangeFolder_Click"/>
                 </Grid>
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0" Content="Upload"></Label>
-                    <Label Grid.Column="1" Content="Upload status" Name="lblCurrentPdfUploadStatus"></Label>
-                </Grid>
+                <ListView x:Name="lsvFiles" Grid.Row="1" >
+
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="200" Header="File name" DisplayMemberBinding="{Binding Path=FileName}"  />
+                            <GridViewColumn  Width="70" Header="Parse" DisplayMemberBinding="{Binding Path=ParseStepText}"/>
+                            <GridViewColumn  Width="70" Header="Upload" DisplayMemberBinding="{Binding Path=UploadStateText}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Grid>
-            <ListView Grid.Row="1" Name="lsvCurrentPdf">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="1" HorizontalAlignment="Stretch"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80*">
-                                    </ColumnDefinition>
-                                    <ColumnDefinition Width="20*">
-                                    </ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Image Grid.Column="0" Source="{Binding PageBitmapData}"  HorizontalAlignment="Center" VerticalAlignment="Top"></Image>
-                                <Grid Grid.Column="1">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <Label Grid.Row="0"  Content="{Binding Path=PageIndex}" HorizontalAlignment="Center" VerticalAlignment="Bottom"></Label>
-                                    <Button Grid.Row="1" Content="View image"></Button>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20*"></RowDefinition>
+                    <RowDefinition Height="80*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Name="lblCurrentPdf" Content="Current pdf"></Label>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Parse"></Label>
+                        <Label Grid.Column="1" Content="Parse status" Name="lblCurrentPdfParseStatus"></Label>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Upload"></Label>
+                        <Label Grid.Column="1" Content="Upload status" Name="lblCurrentPdfUploadStatus"></Label>
+                    </Grid>
+                </Grid>
+                <ListView Grid.Row="1" Name="lsvCurrentPdf">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="1" HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="80*">
+                                        </ColumnDefinition>
+                                        <ColumnDefinition Width="20*">
+                                        </ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Grid.Column="0" Source="{Binding PageBitmapData}"  HorizontalAlignment="Center" VerticalAlignment="Top"></Image>
+                                    <Grid Grid.Column="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0"  Content="{Binding Path=PageIndex}" HorizontalAlignment="Center" VerticalAlignment="Bottom"></Label>
+                                        <Button Grid.Row="1" Content="View image"></Button>
+                                    </Grid>
+
                                 </Grid>
 
-                            </Grid>
-
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Grid>
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30*" ></RowDefinition>
-                <RowDefinition Height="70*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40*"></ColumnDefinition>
-                    <ColumnDefinition Width="60*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
-                <Button Grid.Column="0" Grid.Row="0" Content="Try parse" Name="btnTryParse"></Button>
-                <Button Grid.Column="1" Grid.Row="0" Content="Try upload" Name="btnTryUpload"></Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </Grid>
-            <ScrollViewer Grid.Row="1" Visibility="Visible" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-                <TextBox Name="txtPdfContentText" Text="Content parsed"  ></TextBox>
-            </ScrollViewer>
-            
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="8*" ></RowDefinition>
+                    <RowDefinition Height="40*" ></RowDefinition>
+                    <RowDefinition Height="52*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"  Content="Update modify bellow" ></Button>
+                    <Button Grid.Column="1"  Content="Try parse" Name="btnTryParse"></Button>
+                    <Button Grid.Column="2"  Content="Try upload" Name="btnTryUpload"></Button>                    
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>                        
+                        <ColumnDefinition Width="40*"></ColumnDefinition>
+                        <ColumnDefinition Width="60*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Content="Date"></Label>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Code"></Label>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Title"></Label>
+                    <Label Grid.Row="3" Grid.Column="0" Content="Signed by"></Label>
+                    <Label Grid.Row="4" Grid.Column="0" Content="Signed date"></Label>
+                </Grid>
+                <ScrollViewer Grid.Row="2" Visibility="Visible" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                    <TextBox Name="txtPdfContentText" Text="Content parsed"  ></TextBox>
+                </ScrollViewer>
+
+            </Grid>
         </Grid>
     </Grid>
+
 </Window>
