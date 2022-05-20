@@ -30,6 +30,23 @@ namespace PdfExtractor
 
             btnTryParse.Click += BtnTryParse_Click;
             btnTryUpload.Click += BtnTryUpload_Click;
+
+            btnRetryParseFailed.Click += BtnRetryParseFailed_Click;
+
+            txtFolder.Text = MyAppContext.CurrentFolder;
+        }
+
+        private void BtnRetryParseFailed_Click(object sender, RoutedEventArgs e)
+        {
+            MyAppContext.Run((itm) =>
+            {
+                var _ = Task.Run(() =>
+                {
+                    this.BindFilesToListView();
+
+                    this.BindCurrentPdfPreview();
+                });
+            });
         }
 
         private void BtnTryUpload_Click(object sender, RoutedEventArgs e)
@@ -78,6 +95,7 @@ namespace PdfExtractor
                 var _ = Task.Run(() =>
                 {
                     itm.Prepare();
+
                     this.BindFilesToListView();
 
                     _currentPdf = itm;
@@ -90,9 +108,11 @@ namespace PdfExtractor
                     });                    
 
                     var _ = Task.Run(() => {
+
                         _currentPdf.Parse();
 
                         this.BindFilesToListView();
+
                         this.BindCurrentPdfPreview();
 
                         Dispatcher.Invoke(() =>
@@ -111,24 +131,25 @@ namespace PdfExtractor
 
         void BindCurrentPdfPreview()
         {
-            if (_currentPdf == null) return;
+            var _ = Task.Run(() =>
+              {
+                  if (_currentPdf == null) return;
 
-            Dispatcher.Invoke(() =>
-            {
-                lblCurrentPdf.Content = _currentPdf.FileName;
-                lblCurrentPdfParseStatus.Content = _currentPdf.ParseStepText;
-                lblCurrentPdfUploadStatus.Content = _currentPdf.UploadStateText;
+                  Dispatcher.Invoke(() =>
+                  {
+                      lblCurrentPdf.Content = _currentPdf.FileName;
+                      lblCurrentPdfParseStatus.Content = _currentPdf.ParseStepText;
+                      lblCurrentPdfUploadStatus.Content = _currentPdf.UploadStateText;
 
-                lsvCurrentPdf.Items.Clear();
-                foreach (var p in _currentPdf.Pages)
-                {
-                    lsvCurrentPdf.Items.Add(p);
-                }
-            });
-
+                      lsvCurrentPdf.Items.Clear();
+                      foreach (var p in _currentPdf.Pages)
+                      {
+                          lsvCurrentPdf.Items.Add(p);
+                      }
+                  });
+              });
         }
 
-        public List<PdfToImageProcessing> CurrentFiles { get; set; } = new List<PdfToImageProcessing>();
 
         private void btnChangeFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -143,12 +164,6 @@ namespace PdfExtractor
 
                     var _ = Task.Run(() =>
                     {
-                        foreach (var f in MyAppContext.CurrentFiles)
-                        {
-                            PdfToImageProcessing item = new PdfToImageProcessing(f);
-
-                            CurrentFiles.Add(item);
-                        }
 
                         this.BindFilesToListView();
 
@@ -159,14 +174,16 @@ namespace PdfExtractor
 
         void BindFilesToListView()
         {
-            Dispatcher.Invoke(() =>
+            var _ = Task.Run(() =>
             {
-                lsvFiles.Items.Clear();
+                Dispatcher.Invoke(() =>
+                {
+                    lsvFiles.Items.Clear();
 
-                foreach (var item in CurrentFiles) lsvFiles.Items.Add(item);
+                    foreach (var item in MyAppContext.CurrentFilesToProcess) lsvFiles.Items.Add(item);
 
+                });
             });
-
         }
 
     }

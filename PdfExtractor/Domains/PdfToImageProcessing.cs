@@ -24,7 +24,14 @@ namespace PdfExtractor.Domains
                 if (ParseStep == 0) return "Waiting";
                 if (ParseStep == 1) return "Prepared";
 
-                if (ParseStep == 2) return "Success";
+                if (ParseStep == 2) return "Got Content";
+
+                if (ParseStep == 3) return "Got Code";
+                if (ParseStep == 4) return "Got Title";
+
+                if (ParseStep == 5) return "Got Signed by";
+
+                if (ParseStep == 6) return "Done";
 
                 if (ParseStep == -1) return "Failed";
 
@@ -58,7 +65,7 @@ namespace PdfExtractor.Domains
 
         public List<MyPdfPage> Prepare()
         {
-            if(ParseStep>0) return _pages;
+            if (ParseStep > 0) return _pages;
 
             ParseStep = 0;
             _pages = Freeware.Pdf2Png.ConvertAllPages(File.OpenRead(_filepdf))
@@ -106,9 +113,42 @@ namespace PdfExtractor.Domains
                 OnDoneParsePageIndex?.Invoke(p.PageIndex);
             });
 
-            if (pres.Any(i => i == -1)) ParseStep = -1;
+            if (pres.Any(i => i == -1))
+            {
+                _pages = new List<MyPdfPage>();
+                ParseStep = -1;
+                return;
+            }
 
             ParseStep = 2;
+
+            ParseCode();
+
+            ParseTitle();
+
+            ParseSignedBy();
+
+            ParseStep = 6;
+        }
+
+
+        public void ParseCode()
+        {
+
+            ParseStep = 3;
+
+        }
+
+        public void ParseTitle()
+        {
+
+            ParseStep = 4;
+        }
+
+        public void ParseSignedBy()
+        {
+
+            ParseStep = 5;
         }
 
     }

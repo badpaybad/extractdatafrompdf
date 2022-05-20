@@ -16,7 +16,7 @@
             <Separator/>
             <Button Content="View logs"/>
             <Separator/>
-            <Button Content="Retry parse failed"/>
+            <Button Content="Retry parse failed" Name="btnRetryParseFailed"/>
             <Separator/>
             <Button Content="Retry upload failed"/>
         </ToolBar>
