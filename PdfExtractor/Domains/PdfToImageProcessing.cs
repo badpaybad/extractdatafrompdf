@@ -115,7 +115,7 @@ namespace PdfExtractor.Domains
 
             if (pres.Any(i => i == -1))
             {
-                _pages = new List<MyPdfPage>();
+                _pages = null;
                 ParseStep = -1;
                 return;
             }
@@ -151,5 +151,9 @@ namespace PdfExtractor.Domains
             ParseStep = 5;
         }
 
+        public void Reset()
+        {
+            _pages = null;
+        }
     }
 }

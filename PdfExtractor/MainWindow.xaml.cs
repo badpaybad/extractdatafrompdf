@@ -23,6 +23,12 @@ namespace PdfExtractor
     {
         public MainWindow()
         {
+            MyAppContext.Init(() =>
+            {
+                this.BindFilesToListView();
+                this.BindCurrentPdfPreview();
+            });
+
             InitializeComponent();
 
             lsvFiles.SelectionChanged += LsvFiles_SelectionChanged;

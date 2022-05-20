@@ -152,7 +152,9 @@
                     <Label Grid.Row="3" Grid.Column="0" Content="Signed by"></Label>
                     <Label Grid.Row="4" Grid.Column="0" Content="Signed date"></Label>
                 </Grid>
-                <ScrollViewer Grid.Row="2" Visibility="Visible" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                <ScrollViewer Grid.Row="2"
+                              BorderBrush="Black" BorderThickness="1"
+                              Visibility="Visible" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
                     <TextBox Name="txtPdfContentText" Text="Content parsed"  ></TextBox>
                 </ScrollViewer>
 

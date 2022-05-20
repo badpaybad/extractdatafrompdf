@@ -16,7 +16,7 @@ namespace PdfExtractor.Domains
 
         public static List<PdfToImageProcessing> CurrentFilesToProcess { get; set; } = new List<PdfToImageProcessing>();
 
-        static MyAppContext()
+        public static void Init(Action? callBack)
         {
             ////
             var temp = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pdffolder.bin");
@@ -25,10 +25,14 @@ namespace PdfExtractor.Domains
             {
                 using (var sr = new StreamReader(temp))
                 {
-                    CurrentFolder = sr.ReadToEnd();
+                    CurrentFolder = sr.ReadToEnd().Trim(new char[] {' ','\r','\n'});
                 }
+
+                BuildFiles();
             }
             //
+
+            callBack?.Invoke();
         }
 
         public static void SetCurrentFolder(string path)
@@ -55,16 +59,34 @@ namespace PdfExtractor.Domains
             {
                 if (f.FullName.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
                 {
-                    CurrentFiles.Add(f.FullName.Replace("\\", "/"));
+                    string file = f.FullName.Replace("\\", "/");
+                    
+                    CurrentFiles.Add(file);
+
+                    PdfToImageProcessing item = new PdfToImageProcessing(file);
+                    CurrentFilesToProcess.Add(item);
                 }
             }
 
+        }
 
-            foreach (var f in MyAppContext.CurrentFiles)
+        static void AddFileIfNotExisted()
+        {
+            var dir = new DirectoryInfo(CurrentFolder);
+
+            foreach (var f in dir.GetFiles())
             {
-                PdfToImageProcessing item = new PdfToImageProcessing(f);
+                if (f.FullName.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
+                {
+                    var file = f.FullName.Replace("\\", "/");
+                    if(!CurrentFiles.Contains(file))
+                    {
+                        CurrentFiles.Add(file);
 
-                CurrentFilesToProcess.Add(item);
+                        PdfToImageProcessing item = new PdfToImageProcessing(file);
+                        CurrentFilesToProcess.Add(item);
+                    }
+                }
             }
         }
 
@@ -88,16 +110,24 @@ namespace PdfExtractor.Domains
                 {
                     try
                     {
+                        AddFileIfNotExisted();
+
                         Parallel.ForEach(CurrentFilesToProcess, new ParallelOptions
                         {
                             MaxDegreeOfParallelism = (int)(Environment.ProcessorCount * 2) / 3,
                         }, itm =>
                         {
-                            callBack?.Invoke(itm);
-                            itm.Prepare();
-                            callBack?.Invoke(itm);
-                            itm.Parse();
-                            callBack?.Invoke(itm);
+                            try {
+
+                                callBack?.Invoke(itm);
+                                itm.Prepare();
+                                callBack?.Invoke(itm);
+                                itm.Parse();
+                                callBack?.Invoke(itm);
+                            }
+                            catch {
+                                itm.Reset();
+                            }
                         });
                     }
                     catch (Exception ex)
