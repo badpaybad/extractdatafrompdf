@@ -84,13 +84,22 @@
                         <Label Grid.Column="1" Content="Upload status" Name="lblCurrentPdfUploadStatus"></Label>
                     </Grid>
                 </Grid>
-                <ListView Grid.Row="1" Name="lsvCurrentPdf">
-                    <ItemsControl.ItemsPanel>
+                <ListView Grid.Row="1" Name="lsvCurrentPdf" SelectionMode="Single"   >
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="IsSelected" Value="True"></Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ItemsControl.ItemsPanel >
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
-                    <ListView.ItemTemplate>
+                    <ListView.ItemTemplate >
                         <DataTemplate>
                             <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
                                 <Grid>

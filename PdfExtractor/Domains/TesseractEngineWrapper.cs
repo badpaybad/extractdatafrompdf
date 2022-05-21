@@ -13,9 +13,9 @@ namespace PdfExtractor.Domains
     public class TesseractEngineWrapper
     {
         //static ConcurrentDictionary<string, TesseractEngine> _engine = new ConcurrentDictionary<string, TesseractEngine>();
-        
-        string folderData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
 
+        string folderData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+        static char[] _trimChars = { ' ', '\r', '\n' };
         public TesseractEngineWrapper()
         {
 
@@ -53,7 +53,7 @@ namespace PdfExtractor.Domains
                 }
             }
 
-            return ocrtext;
+            return ocrtext.Trim(_trimChars);
         }
 
     }

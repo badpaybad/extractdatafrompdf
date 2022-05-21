@@ -32,6 +32,7 @@ namespace PdfExtractor
             InitializeComponent();
 
             lsvFiles.SelectionChanged += LsvFiles_SelectionChanged;
+            
             //https://docs.google.com/spreadsheets/d/1Q3yQxR7sVtrCBa_HurPo8Ur2XSveaelMf7eZdDDeWDE/edit#gid=0
 
             lsvCurrentPdf.SelectionChanged += LsvCurrentPdf_SelectionChanged;

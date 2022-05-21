@@ -57,7 +57,7 @@ namespace PdfExtractor.Domains
 
             List<string> files = dir.GetFiles().Select(i=>i.FullName).ToList();
 
-            files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
+            //files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
           
             foreach (var f in files)
             {
@@ -81,7 +81,7 @@ namespace PdfExtractor.Domains
 
             List<string> files = dir.GetFiles().Select(i => i.FullName).ToList();
 
-            files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
+            //files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
 
             foreach (var f in files)
             {
