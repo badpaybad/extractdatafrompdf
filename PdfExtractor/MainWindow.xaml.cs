@@ -61,9 +61,9 @@ namespace PdfExtractor
         {
             if (_currentPdf == null) return;
 
-            _currentPdf.SetProperty("Code", txtCode.Text, null);
-            _currentPdf.SetProperty("Title", txtTitle.Text, null);
-            _currentPdf.SetProperty("SignedBy", txtSignedBy.Text, null);
+            _currentPdf.SetProperty("Code", txtCode.Text, null,-1);
+            _currentPdf.SetProperty("Title", txtTitle.Text, null,-1);
+            _currentPdf.SetProperty("SignedBy", txtSignedBy.Text, null,-1);
         }
 
         void DispatcherInvoke(Action callback)

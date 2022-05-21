@@ -34,11 +34,13 @@
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80*" ></ColumnDefinition>
+                                <ColumnDefinition Width="70*" ></ColumnDefinition>
+                                <ColumnDefinition Width="10*" ></ColumnDefinition>
                                 <ColumnDefinition Width="20*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="1" Content="X" Click="btnDelete_OnClick"></Button>
                             <Label Grid.Column="0" Content="{Binding Path=Key}"></Label>
+                            <Label Grid.Column="1" Content="{Binding Path=PageIndex}"></Label>
+                            <Button Grid.Column="2" Content="X" Click="btnDelete_OnClick"></Button>
                         </Grid>
                         <ScrollViewer Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,0"
                                      Visibility="Visible" HorizontalScrollBarVisibility="Visible"

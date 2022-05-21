@@ -68,7 +68,7 @@ namespace PdfExtractor
             canvasBgImage.MouseUp += CanvasImageMain_MouseUp;
             canvasBgImage.MouseMove += CanvasImageMain_MouseMove;
 
-
+            DrawBoxes();
         }
 
         private void _imageMain_OnSetProperty(string arg1, string arg2, System.Drawing.Rectangle? arg3)
@@ -156,9 +156,8 @@ namespace PdfExtractor
                 if (prmt.ShowDialog() == true)
                 {
                     if (!string.IsNullOrEmpty(prmt.ResponseText) && !string.IsNullOrEmpty(prmt.ResponseType))
-                    {
-                        _imageMain.PdfProperties[prmt.ResponseType] = prmt.ResponseText;
-                        _imageMain.PdfPropertiesRegion[prmt.ResponseType] = rect;
+                    {                        
+                        _imageMain.SetProperty(prmt.ResponseType, prmt.ResponseText, rect, _imageClicked.PageIndex);
                     }
                 }
 
@@ -195,13 +194,17 @@ namespace PdfExtractor
             _tempBitmap = new Bitmap(_imageClicked.PageImage, (int)canvasBgImage.Width, (int)canvasBgImage.Height);
 
             using (Graphics graphics = Graphics.FromImage(_tempBitmap))
-                foreach (var box in _imageMain.PdfPropertiesRegion)
+                foreach (var boxX in _imageMain.PdfPropertiesRegion)
                 {
+                    var box=boxX.Value.FirstOrDefault();
+
+                    if (_imageClicked.PageIndex != box.Key) continue;
+
                     graphics.DrawRectangle(new System.Drawing.Pen(new System.Drawing.SolidBrush(_color), 2), box.Value);
-                    graphics.DrawString(box.Key, new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
+                    graphics.DrawString(boxX.Key, new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
                         , new SolidBrush(_color), box.Value.X, box.Value.Y);
 
-                    graphics.DrawString(_imageMain.PdfProperties[box.Key], new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
+                    graphics.DrawString(_imageMain.PdfProperties[boxX.Key], new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
                         , new SolidBrush(_color), box.Value.X, box.Value.Y + box.Value.Height);
                 }
 
@@ -216,7 +219,9 @@ namespace PdfExtractor
 
                 foreach (var i in _imageMain.PdfProperties)
                 {
-                    lsvPdfProps.Items.Add(new MyKeyValue { Key = i.Key, Value = i.Value });
+                    lsvPdfProps.Items.Add(new MyKeyValue { Key = i.Key, Value = i.Value
+                        ,PageIndex= _imageMain.PdfPropertiesRegion[i.Key].FirstOrDefault().Key
+                    });
                 }
             });
         }
@@ -266,6 +271,8 @@ namespace PdfExtractor
         {
             public string Key { get; set; }
             public string Value { get; set; }
+
+            public int PageIndex { get; set; }
         }
     }
 }

@@ -61,7 +61,7 @@ namespace PdfExtractor.Domains
         private readonly int _threadConsume = 1;
 
         public Dictionary<string, string> PdfProperties = new Dictionary<string, string>();
-        public Dictionary<string, System.Drawing.Rectangle> PdfPropertiesRegion = new Dictionary<string, System.Drawing.Rectangle>();
+        public Dictionary<string, Dictionary<int, System.Drawing.Rectangle>> PdfPropertiesRegion = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle>>();
 
         public PdfToImageProcessing(string filePdf)
         {
@@ -79,12 +79,12 @@ namespace PdfExtractor.Domains
 
         public event Action<string, string, System.Drawing.Rectangle?>? OnSetProperty;
 
-        public void SetProperty(string propertyName, string value, System.Drawing.Rectangle? box)
+        public void SetProperty(string propertyName, string value, System.Drawing.Rectangle? box,int boxInPageIdx)
         {
             PdfProperties[propertyName] = value;
 
             if (box != null)
-                PdfPropertiesRegion[propertyName] = box.Value;
+                PdfPropertiesRegion[propertyName] = new Dictionary<int, System.Drawing.Rectangle>() { { boxInPageIdx, box.Value } };
 
             OnSetProperty?.Invoke(propertyName, value, box);
         }
