@@ -178,8 +178,6 @@ namespace PdfExtractor.Domains
 
                             iText.Layout.Element.Image image = new iText.Layout.Element.Image(xobj);
 
-
-
                             //iText.Layout.Document docx = new iText.Layout.Document(pdf);
 
                         }
@@ -194,15 +192,14 @@ namespace PdfExtractor.Domains
                             ContentText = eventListener.GetText(),
 
                         };
+
                         pages.Add(item);
-
-
 
                         if (OnPageExtract != null) OnPageExtract(item);
                     }
                     catch (Exception exp)
                     {
-
+                        //
                     }
                 }
 

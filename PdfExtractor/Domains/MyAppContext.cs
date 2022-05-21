@@ -55,11 +55,15 @@ namespace PdfExtractor.Domains
             CurrentFiles = new List<string>();
             CurrentFilesToProcess = new List<PdfToImageProcessing>();
 
-            foreach (var f in dir.GetFiles())
+            List<string> files = dir.GetFiles().Select(i=>i.FullName).ToList();
+
+            files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
+          
+            foreach (var f in files)
             {
-                if (f.FullName.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
+                if (f.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
                 {
-                    string file = f.FullName.Replace("\\", "/");
+                    string file = f.Replace("\\", "/");
                     
                     CurrentFiles.Add(file);
 
@@ -74,11 +78,16 @@ namespace PdfExtractor.Domains
         {
             var dir = new DirectoryInfo(CurrentFolder);
 
-            foreach (var f in dir.GetFiles())
+
+            List<string> files = dir.GetFiles().Select(i => i.FullName).ToList();
+
+            files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
+
+            foreach (var f in files)
             {
-                if (f.FullName.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
+                if (f.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
                 {
-                    var file = f.FullName.Replace("\\", "/");
+                    var file = f.Replace("\\", "/");
                     if(!CurrentFiles.Contains(file))
                     {
                         CurrentFiles.Add(file);
@@ -119,7 +128,7 @@ namespace PdfExtractor.Domains
                             MaxDegreeOfParallelism = threadConsume,
                         }, itm =>
                         {
-                            if (itm.ParseStep > 0 ) return;
+                            if (itm.ParseStep > 0) return;
 
                             try {
 

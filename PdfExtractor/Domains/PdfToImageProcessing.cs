@@ -17,6 +17,8 @@ namespace PdfExtractor.Domains
 
         public string UploadStateText { get; set; } = string.Empty;
 
+        public string ContextText { get; set; }
+
         public string ParseStepText
         {
             get
@@ -39,7 +41,16 @@ namespace PdfExtractor.Domains
             }
         }
 
-        public List<MyPdfPage> Pages { get { return _pages; } }
+        public List<MyPdfPage> Pages
+        {
+            get
+            {
+
+                if (_pages == null) Prepare();
+
+                return _pages;
+            }
+        }
 
         readonly string _filepdf = string.Empty;
 
@@ -49,8 +60,8 @@ namespace PdfExtractor.Domains
 
         private readonly int _threadConsume = 1;
 
-        public Dictionary<string,string> PdfProperties = new Dictionary<string,string>();
-        public Dictionary<string,System.Drawing.Rectangle> PdfPropertiesRegion = new Dictionary<string, System.Drawing.Rectangle>();
+        public Dictionary<string, string> PdfProperties = new Dictionary<string, string>();
+        public Dictionary<string, System.Drawing.Rectangle> PdfPropertiesRegion = new Dictionary<string, System.Drawing.Rectangle>();
 
         public PdfToImageProcessing(string filePdf)
         {
@@ -66,13 +77,14 @@ namespace PdfExtractor.Domains
             ParseStep = 0;
         }
 
+        public event Action<string, string, System.Drawing.Rectangle?>? OnSetProperty;
 
-        public event Action<string,string, System.Drawing.Rectangle>? OnSetProperty;
-
-        public void SetProperty(string propertyName, string value, System.Drawing.Rectangle box)
+        public void SetProperty(string propertyName, string value, System.Drawing.Rectangle? box)
         {
             PdfProperties[propertyName] = value;
-            PdfPropertiesRegion[propertyName] = box;
+
+            if (box != null)
+                PdfPropertiesRegion[propertyName] = box.Value;
 
             OnSetProperty?.Invoke(propertyName, value, box);
         }
@@ -135,6 +147,8 @@ namespace PdfExtractor.Domains
             }
 
             ParseStep = 2;
+
+            ContextText= string.Join("\r\n", _pages.Select(i => i.ContentText));
 
             ParseCode();
 

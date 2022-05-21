@@ -32,7 +32,7 @@ namespace PdfExtractor
 
         IInputElement inputElement;
 
-        Dictionary<string, System.Drawing.Rectangle> boxes = new Dictionary<string, System.Drawing.Rectangle>();
+        int _ratioResize = 4;
 
         public ViewAndBoxingImageWindow(PdfToImageProcessing imageMain, MyPdfPage imageClicked)
         {
@@ -44,8 +44,19 @@ namespace PdfExtractor
 
             InitializeComponent();
 
-            canvasBgImage.Width = _imageClicked.PageImage.Width / 2;
-            canvasBgImage.Height = _imageClicked.PageImage.Height / 2;
+            canvasBgImage.Width = _imageClicked.PageImage.Width / _ratioResize;
+            canvasBgImage.Height = _imageClicked.PageImage.Height / _ratioResize;
+
+            canvasContainer.Width = canvasBgImage.Width;
+            canvasContainer.Height = canvasBgImage.Height;
+
+            mainGrid.Width = canvasContainer.Height;
+            this.Height = canvasContainer.Height;
+
+            mainGrid.Width = canvasContainer.Width + canvasContainer.Width * 0.5;
+            this.Width = mainGrid.Width;
+
+            this.ResizeMode = ResizeMode.NoResize;
 
             _tempBitmap = new Bitmap(_imageClicked.PageImage, (int)canvasBgImage.Width, (int)canvasBgImage.Height);
 
@@ -56,11 +67,13 @@ namespace PdfExtractor
             canvasBgImage.MouseDown += CanvasImageMain_MouseDown;
             canvasBgImage.MouseUp += CanvasImageMain_MouseUp;
             canvasBgImage.MouseMove += CanvasImageMain_MouseMove;
+
+
         }
 
-        private void _imageMain_OnSetProperty(string arg1, string arg2, System.Drawing.Rectangle arg3)
+        private void _imageMain_OnSetProperty(string arg1, string arg2, System.Drawing.Rectangle? arg3)
         {
-            
+
         }
 
         BitmapImage ConvertFromBmp(Bitmap bmp)
@@ -127,57 +140,132 @@ namespace PdfExtractor
         }
 
         private void CanvasImageMain_MouseUp(object sender, MouseButtonEventArgs e)
-        { // Release the mouse capture and stop tracking it.
-            mouseDown = false;
-            canvasBgImage.ReleaseMouseCapture();
-
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle((int)Canvas.GetLeft(selectionBox), (int)Canvas.GetTop(selectionBox), (int)selectionBox.Width, (int)selectionBox.Height);
-
-
-            var prmt = new PromtSelectPartOfPdfWindow(CropImage(rect));
-
-            if (prmt.ShowDialog() == true)
+        {
+            try
             {
-                _imageMain.PdfProperties[prmt.ResponseType] = prmt.ResponseText;
-                _imageMain.PdfPropertiesRegion[prmt.ResponseType] = rect;
 
-                boxes[prmt.ResponseType] = rect;
+                // Release the mouse capture and stop tracking it.
+                mouseDown = false;
+                canvasBgImage.ReleaseMouseCapture();
+
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle((int)Canvas.GetLeft(selectionBox), (int)Canvas.GetTop(selectionBox), (int)selectionBox.Width, (int)selectionBox.Height);
+
+
+                var prmt = new PromtSelectPartOfPdfWindow(CropImage(rect));
+
+                if (prmt.ShowDialog() == true)
+                {
+                    if (!string.IsNullOrEmpty(prmt.ResponseText) && !string.IsNullOrEmpty(prmt.ResponseType))
+                    {
+                        _imageMain.PdfProperties[prmt.ResponseType] = prmt.ResponseText;
+                        _imageMain.PdfPropertiesRegion[prmt.ResponseType] = rect;
+                    }
+                }
+
+                // Hide the drag selection box.
+                selectionBox.Visibility = Visibility.Collapsed;
+
+                var mouseUpPos = e.GetPosition(inputElement);
+
+                // TODO: 
+                //
+                // The mouse has been released, check to see if any of the items 
+                // in the other canvas are contained within mouseDownPos and 
+                // mouseUpPos, for any that are, select them!
+                //
+                DrawBoxes();
+
+                BindingListViewRight();
             }
-
-            // Hide the drag selection box.
-            selectionBox.Visibility = Visibility.Collapsed;
-
-            var mouseUpPos = e.GetPosition(inputElement);
-
-            // TODO: 
-            //
-            // The mouse has been released, check to see if any of the items 
-            // in the other canvas are contained within mouseDownPos and 
-            // mouseUpPos, for any that are, select them!
-            //
-            DrawBoxes();
+            catch (Exception)
+            {
+                //
+            }
         }
         private Bitmap CropImage(System.Drawing.Rectangle cropArea)
         {
             var bmpImage = _imageClicked.PageImage;
 
-            return bmpImage.Clone(new System.Drawing.Rectangle((int)cropArea.X * 2, (int)cropArea.Y * 2, (int)cropArea.Width * 2, (int)cropArea.Height * 2), bmpImage.PixelFormat);
+            return bmpImage.Clone(new System.Drawing.Rectangle((int)cropArea.X * _ratioResize, (int)cropArea.Y * _ratioResize, (int)cropArea.Width * _ratioResize, (int)cropArea.Height * _ratioResize), bmpImage.PixelFormat);
         }
+
+        System.Drawing.Color _color = System.Drawing.Color.Red;
         void DrawBoxes()
         {
             _tempBitmap = new Bitmap(_imageClicked.PageImage, (int)canvasBgImage.Width, (int)canvasBgImage.Height);
 
             using (Graphics graphics = Graphics.FromImage(_tempBitmap))
-                foreach (var box in boxes)
+                foreach (var box in _imageMain.PdfPropertiesRegion)
                 {
-                    graphics.DrawRectangle(new System.Drawing.Pen(new System.Drawing.SolidBrush(System.Drawing.Color.Black), 2), box.Value);
-                    graphics.DrawString(box.Key, new System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Regular)
-                        , new SolidBrush(System.Drawing.Color.Black), box.Value.X, box.Value.Y);
+                    graphics.DrawRectangle(new System.Drawing.Pen(new System.Drawing.SolidBrush(_color), 2), box.Value);
+                    graphics.DrawString(box.Key, new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
+                        , new SolidBrush(_color), box.Value.X, box.Value.Y);
 
+                    graphics.DrawString(_imageMain.PdfProperties[box.Key], new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
+                        , new SolidBrush(_color), box.Value.X, box.Value.Y + box.Value.Height);
                 }
 
             canvasBgImage.Source = ConvertFromBmp(_tempBitmap);
         }
 
+        void BindingListViewRight()
+        {
+            DispatcherInvoke(() =>
+            {
+                lsvPdfProps.Items.Clear();
+
+                foreach (var i in _imageMain.PdfProperties)
+                {
+                    lsvPdfProps.Items.Add(new MyKeyValue { Key = i.Key, Value = i.Value });
+                }
+            });
+        }
+
+        void btnDelete_OnClick(object sender, RoutedEventArgs e)
+        {
+            MyKeyValue val = new MyKeyValue();
+            if (lsvPdfProps.SelectedItem == null)
+            {
+                if (lsvPdfProps.Items.Count > 0)
+                    val = (MyKeyValue)lsvPdfProps.Items[0];
+            }
+            else
+            {
+                val = (MyKeyValue)lsvPdfProps.SelectedItem;
+            }
+
+            if (!string.IsNullOrEmpty(val.Key))
+            {
+                _imageMain.PdfPropertiesRegion.Remove(val.Key);
+                _imageMain.PdfProperties.Remove(val.Key);
+            }
+
+            DrawBoxes();
+
+            BindingListViewRight();
+        }
+
+
+        void DispatcherInvoke(Action a)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    a();
+                }
+                catch (Exception)
+                {
+                    //
+                }
+            });
+        }
+
+
+        public class MyKeyValue
+        {
+            public string Key { get; set; }
+            public string Value { get; set; }
+        }
     }
 }
