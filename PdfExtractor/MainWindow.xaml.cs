@@ -40,6 +40,16 @@ namespace PdfExtractor
             btnRetryParseFailed.Click += BtnRetryParseFailed_Click;
 
             txtFolder.Text = MyAppContext.CurrentFolder;
+
+            MyAppContext.Run((itm) =>
+            {
+                var _ = Task.Run(() =>
+                {
+                    this.BindFilesToListView();
+
+                    this.BindCurrentPdfPreview();
+                });
+            });
         }
 
         private void BtnRetryParseFailed_Click(object sender, RoutedEventArgs e)

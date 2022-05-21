@@ -51,7 +51,7 @@ namespace PdfExtractor.Domains
 
         public PdfToImageProcessing(string filePdf)
         {
-            _threadConsume = (Environment.ProcessorCount * 2) / 3 + 1;
+            _threadConsume = (Environment.ProcessorCount * 1) / 5 + 1;
 
             _filepdf = filePdf.Replace("\\", "/");
 

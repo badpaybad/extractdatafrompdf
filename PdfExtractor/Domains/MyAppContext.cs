@@ -106,6 +106,8 @@ namespace PdfExtractor.Domains
 
                 await Task.Yield();
 
+                int threadConsume = (int)(Environment.ProcessorCount * 1) / 5 +1;
+
                 while (!_stop)
                 {
                     try
@@ -114,9 +116,11 @@ namespace PdfExtractor.Domains
 
                         Parallel.ForEach(CurrentFilesToProcess, new ParallelOptions
                         {
-                            MaxDegreeOfParallelism = (int)(Environment.ProcessorCount * 2) / 3,
+                            MaxDegreeOfParallelism = threadConsume,
                         }, itm =>
                         {
+                            if (itm.ParseStep > 0 ) return;
+
                             try {
 
                                 callBack?.Invoke(itm);
