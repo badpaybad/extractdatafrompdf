@@ -33,7 +33,30 @@ namespace PdfExtractor.Domains
         public byte[]? PageBytes { get; set; }
         public MemoryStream? PageStream { get; set; }
 
-        public Bitmap? PageImage { get; set; } 
+        public Bitmap? PageImage { get; set; }
+
+        public BitmapImage ResizeTo(int percentage)
+        {
+            var img = PageImage;
+
+            int neww = (img.Width * percentage) / 100;
+            var newh = (img.Height * percentage) / 100;
+
+            using (MemoryStream memory = new MemoryStream())
+            {
+                Bitmap thumb = new Bitmap(img, neww, newh);
+
+                thumb.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
+        }
 
         public System.Windows.Media.Imaging.BitmapImage? PageBitmapData
         {
@@ -65,12 +88,12 @@ namespace PdfExtractor.Domains
                 }
             }
         }
-                
+
     }
 
     public class PdfExtractor
     {
-       
+
         public class PdfInfo
         {
             public int TotalPage { get; set; }
@@ -154,11 +177,11 @@ namespace PdfExtractor.Domains
                             PdfFormXObject xobj = page.CopyAsFormXObject(pdf);
 
                             iText.Layout.Element.Image image = new iText.Layout.Element.Image(xobj);
-                            
-                            
+
+
 
                             //iText.Layout.Document docx = new iText.Layout.Document(pdf);
-                            
+
                         }
 
                         //var bmp = ConvertToBitmap(page);

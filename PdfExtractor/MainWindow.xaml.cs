@@ -34,6 +34,8 @@ namespace PdfExtractor
             lsvFiles.SelectionChanged += LsvFiles_SelectionChanged;
             //https://docs.google.com/spreadsheets/d/1Q3yQxR7sVtrCBa_HurPo8Ur2XSveaelMf7eZdDDeWDE/edit#gid=0
 
+            lsvCurrentPdf.SelectionChanged += LsvCurrentPdf_SelectionChanged;
+
             btnTryParse.Click += BtnTryParse_Click;
             btnTryUpload.Click += BtnTryUpload_Click;
 
@@ -50,6 +52,28 @@ namespace PdfExtractor
                     this.BindCurrentPdfPreview();
                 });
             });
+        }
+
+
+        MyPdfPage _currentPageInPdf;
+        private void LsvCurrentPdf_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (lsvCurrentPdf.SelectedItem != null)
+            {
+                var itm = (MyPdfPage)lsvCurrentPdf.SelectedItem;
+
+                _currentPageInPdf = itm;
+            }
+        }
+        public void lsvViewImage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPageInPdf == null && lsvCurrentPdf.Items.Count>0) _currentPageInPdf = (MyPdfPage)lsvCurrentPdf.Items[0];
+
+            if (_currentPageInPdf != null && _currentPdf!=null)
+            {
+                var frm= new ViewAndBoxingImageWindow(_currentPdf, _currentPageInPdf);
+                frm.ShowDialog();
+            }
         }
 
         private void BtnRetryParseFailed_Click(object sender, RoutedEventArgs e)
@@ -93,6 +117,7 @@ namespace PdfExtractor
             
         }
 
+
         PdfToImageProcessing? _currentPdf;
 
         private void LsvFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -116,6 +141,13 @@ namespace PdfExtractor
 
                     _currentPdf = itm;
 
+                    _currentPdf.OnSetProperty += (a, b, c) =>
+                    {
+                        this.BindFilesToListView();
+                        this.BindCurrentPdfPreview();
+                        BindCurrentPdfDetails();
+                    };
+
                     this.BindCurrentPdfPreview();
 
                     Dispatcher.Invoke(() =>
@@ -131,18 +163,31 @@ namespace PdfExtractor
 
                         this.BindCurrentPdfPreview();
 
-                        Dispatcher.Invoke(() =>
-                        {
-                            btnTryParse.Content = "Try parse";
-
-                            txtPdfContentText.Text = String.Join("\r\n\r\n", _currentPdf.Pages.Select(i => i.ContentText));
-                        });
-
+                        BindCurrentPdfDetails();
                     });
                     
                 });
 
             }
+        }
+
+        void BindCurrentPdfDetails()
+        {
+            if (_currentPdf == null) return;
+
+            var _ = Task.Run(() => {
+
+
+                Dispatcher.Invoke(() =>
+                {
+                    btnTryParse.Content = "Try parse";
+
+                    txtPdfContentText.Text = String.Join("\r\n\r\n", _currentPdf.Pages.Select(i => i.ContentText));
+
+                    
+                });
+            });
+
         }
 
         void BindCurrentPdfPreview()

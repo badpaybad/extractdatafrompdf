@@ -49,6 +49,9 @@ namespace PdfExtractor.Domains
 
         private readonly int _threadConsume = 1;
 
+        public Dictionary<string,string> PdfProperties = new Dictionary<string,string>();
+        public Dictionary<string,System.Drawing.Rectangle> PdfPropertiesRegion = new Dictionary<string, System.Drawing.Rectangle>();
+
         public PdfToImageProcessing(string filePdf)
         {
             _threadConsume = (Environment.ProcessorCount * 1) / 5 + 1;
@@ -61,6 +64,17 @@ namespace PdfExtractor.Domains
 
             _ocr = new TesseractEngineWrapper();
             ParseStep = 0;
+        }
+
+
+        public event Action<string,string, System.Drawing.Rectangle>? OnSetProperty;
+
+        public void SetProperty(string propertyName, string value, System.Drawing.Rectangle box)
+        {
+            PdfProperties[propertyName] = value;
+            PdfPropertiesRegion[propertyName] = box;
+
+            OnSetProperty?.Invoke(propertyName, value, box);
         }
 
         public List<MyPdfPage> Prepare()

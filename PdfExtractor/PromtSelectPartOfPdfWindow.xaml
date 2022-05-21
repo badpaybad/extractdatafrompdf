@@ -1,0 +1,30 @@
+﻿<Window x:Class="PdfExtractor.PromtSelectPartOfPdfWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PdfExtractor"
+        mc:Ignorable="d"
+        Title="Select part of pdf" Height="450" Width="800">
+    <Grid x:Name="gridMain">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <RadioButton Grid.Row="0"  Content="Code" GroupName="pdfPart" IsChecked="True"></RadioButton>
+        <RadioButton Grid.Row="1" Content="Title" GroupName="pdfPart"></RadioButton>
+        <RadioButton Grid.Row="2" Content="SignedBy" GroupName="pdfPart"></RadioButton>
+        <TextBox Grid.Row="3" Name="txtCroped"></TextBox>
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" Content="Ok" Name="btnOk"></Button>
+            <Image Grid.Column="0" Name="imgCroped" Stretch="Fill"></Image>
+        </Grid>
+    </Grid>
+</Window>
