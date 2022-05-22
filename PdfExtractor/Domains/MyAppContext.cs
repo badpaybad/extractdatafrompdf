@@ -10,22 +10,35 @@ namespace PdfExtractor.Domains
 {
     internal static class MyAppContext
     {
-        public static LogedInfo Token { get; set; }
-        public static string CurrentFolder { get; set; }
-        public static List<string> CurrentFiles { get; set; }
+        public static LogedInfo? Token { get; set; }
+        public static string CurrentFolder { get; set; } = String.Empty;
+        public static List<string> CurrentFiles { get; set; } = new List<string>();
 
         public static List<PdfToImageProcessing> CurrentFilesToProcess { get; set; } = new List<PdfToImageProcessing>();
 
         public class LogedInfo
         {
-            public string Uid { get; set; }
-            public string Pwd { get; set; }
-            public string Token { get; set; }
+            public string Uid { get; set; } = String.Empty;
+            public string Pwd { get; set; } = string.Empty;
+            public string AccessToken { get; set; } = string.Empty;
         }
-
+        public static void Logout()
+        {
+            try
+            {
+                Token = null;
+                File.Delete(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "remember.bin"));
+            }
+            catch
+            {
+                //
+            }
+        }
         public static bool Login(string uid, string pwd)
         {
             Token = new LogedInfo() { Uid = uid, Pwd = pwd };
+
+            ///token will HttpClient to get
 
             using (var sw = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "remember.bin")))
             {
@@ -40,7 +53,7 @@ namespace PdfExtractor.Domains
         {
             var temp = string.Empty;
             string fiLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "remember.bin");
-            
+
             if (!File.Exists(fiLog)) return false;
 
             using (var sr = new StreamReader(fiLog))
@@ -52,7 +65,7 @@ namespace PdfExtractor.Domains
 
             Token = JsonConvert.DeserializeObject<LogedInfo>(decrypted);
 
-            return Token!=null;
+            return Token != null;
         }
 
         public static void Init(Action? callBack)
@@ -99,13 +112,15 @@ namespace PdfExtractor.Domains
 
             var dir = new DirectoryInfo(CurrentFolder);
 
-            List<string> files = dir.GetFiles().Select(i => i.FullName).ToList();
+            List<string> files = dir.GetFiles().Select(i => i.FullName)
+                .ToList();
 
             ////files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
 
-            foreach (var f in files)
+            for (int i = 0; i < files.Count; i++)
             {
-                if (f.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
+                string? f = files[i];
+                if (f.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
                     var file = f.Replace("\\", "/");
                     if (!CurrentFiles.Contains(file))
@@ -135,7 +150,7 @@ namespace PdfExtractor.Domains
 
                 await Task.Yield();
 
-                int threadConsume = (int)(Environment.ProcessorCount * 1) / 5 + 1;
+                int threadConsume = (Environment.ProcessorCount * 1) / 5 + 1;
 
                 while (!_stop)
                 {
@@ -167,7 +182,7 @@ namespace PdfExtractor.Domains
 
                         SaveData();
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         //
                     }
@@ -219,7 +234,7 @@ namespace PdfExtractor.Domains
 
             OnAutoSave?.Invoke(0);
 
-            var _ = Task.Run(async () =>
+            var _ = Task.Run(() =>
             {
                 try
                 {
@@ -259,12 +274,12 @@ namespace PdfExtractor.Domains
                 ContextText = src.ContextText;
             }
 
-            public string FilePdf { get; set; }
-            public int ParseStep { get; set; }
-            public string FileName { get; set; }
+            public string FilePdf { get; set; } = String.Empty;
+            public int ParseStep { get; set; } 
+            public string FileName { get; set; } = String.Empty;
             public string UploadStateText { get; set; } = string.Empty;
 
-            public string ContextText { get; set; }
+            public string ContextText { get; set; } = String.Empty;
 
             [JsonIgnore]
             public List<MyPdfPage> Pages { get; set; } = new List<MyPdfPage>();
@@ -287,7 +302,7 @@ namespace PdfExtractor.Domains
 
                 };
 
-                //temp.ConvertPagesImages();
+                ////temp.ConvertPagesImages();
 
                 return temp;
             }

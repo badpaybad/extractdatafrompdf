@@ -35,9 +35,11 @@ namespace PdfExtractor.Domains
 
         public Bitmap? PageImage { get; set; }
 
-        public BitmapImage ResizeTo(int percentage)
+        public BitmapImage? ResizeTo(int percentage)
         {
             var img = PageImage;
+
+            if (img == null) return null;
 
             int neww = (img.Width * percentage) / 100;
             var newh = (img.Height * percentage) / 100;
@@ -69,7 +71,7 @@ namespace PdfExtractor.Domains
 
                     using (MemoryStream memory = new MemoryStream())
                     {
-                        Bitmap thumb = new Bitmap(PageImage, 120, (int)120 * PageImage.Height / PageImage.Width);
+                        Bitmap thumb = new Bitmap(PageImage, 120, 120 * PageImage.Height / PageImage.Width);
 
                         thumb.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
                         memory.Position = 0;
@@ -122,7 +124,7 @@ namespace PdfExtractor.Domains
                 ////https://livebook.manning.com/book/itext-in-action-second-edition/chapter-11/182
                 PdfDocument doc = new PdfDocument(new PdfReader(pdfFullPath));
 
-                //PdfFont font = PdfFontFactory.CreateFont("Arial");
+                ////PdfFont font = PdfFontFactory.CreateFont("Arial");
 
                 ////https://riptutorial.com/itext/topic/5780/fonts--itext-5-versus-itext-7
 
@@ -141,25 +143,25 @@ namespace PdfExtractor.Domains
                         var page = doc.GetPage(i);
 
 
-                        //PdfDictionary fontResources = page.GetResources().GetResource(PdfName.Font);
-                        //try
-                        //{
+                        ////PdfDictionary fontResources = page.GetResources().GetResource(PdfName.Font);
+                        ////try
+                        ////{
 
-                        //    foreach (PdfObject font in fontResources.Values(true))
-                        //    {
+                        ////    foreach (PdfObject font in fontResources.Values(true))
+                        ////    {
 
-                        //        if (font is PdfDictionary)
-                        //            fontResources.Put(PdfName.Encoding, PdfName.IdentityH);
-                        //    }
+                        ////        if (font is PdfDictionary)
+                        ////            fontResources.Put(PdfName.Encoding, PdfName.IdentityH);
+                        ////    }
 
-                        //}
-                        //catch { }
+                        ////}
+                        ////catch { }
 
 
 
                         ITextExtractionStrategy strategy
                             = new LocationTextExtractionStrategy();
-                        //= new SimpleTextExtractionStrategy();
+                        ////= new SimpleTextExtractionStrategy();
                         string pageContent = PdfTextExtractor.GetTextFromPage(page, strategy);
 
                         pageContent = Encoding.UTF8.GetString(ASCIIEncoding.Convert(Encoding.Default, Encoding.UTF8, Encoding.Default.GetBytes(pageContent)));
@@ -178,12 +180,9 @@ namespace PdfExtractor.Domains
 
                             iText.Layout.Element.Image image = new iText.Layout.Element.Image(xobj);
 
-                            //iText.Layout.Document docx = new iText.Layout.Document(pdf);
+                            ////iText.Layout.Document docx = new iText.Layout.Document(pdf);
 
                         }
-
-                        //var bmp = ConvertToBitmap(page);
-                        //bmp.Save($"D:/{i}.jpg");
 
                         MyPdfPage item = new MyPdfPage
                         {
@@ -227,9 +226,9 @@ namespace PdfExtractor.Domains
         }
         public class TextChunk : IChunk
         {
-            public string Text { get; set; }
+            public string Text { get; set; } = String.Empty;
             public iText.Kernel.Geom.Rectangle Rect { get; set; }
-            public string FontFamily { get; set; }
+            public string FontFamily { get; set; } = String.Empty;
             public int FontSize { get; set; }
             public FontStyle FontStyle { get; set; }
             public float SpaceWidth { get; set; }
@@ -370,11 +369,6 @@ namespace PdfExtractor.Domains
                     var textRenderMode = character.GetTextRenderMode();
                     var opacity = character.GetGraphicsState().GetFillOpacity();
 
-                    //if (textRenderMode != 0 || opacity != 1)
-                    //{
-
-                    //}
-
                     string letter = character.GetText();
 
                     Color color;
@@ -397,11 +391,6 @@ namespace PdfExtractor.Domains
                     {
                         color = Color.Black;
                     }
-
-                    //if(letter == "A")
-                    //{
-
-                    //}
 
                     if (string.IsNullOrWhiteSpace(letter)) continue;
 
@@ -437,7 +426,7 @@ namespace PdfExtractor.Domains
 
         private static int counter = 0;
 
-        private Func<float> IncreaseCounter = () => counter = Interlocked.Increment(ref counter);
+        private readonly Func<float> IncreaseCounter = () => counter = Interlocked.Increment(ref counter);
         public Bitmap ConvertToBitmap(PdfPage pdfPage)
         {
             var rotation = pdfPage.GetRotation();
@@ -450,7 +439,7 @@ namespace PdfExtractor.Domains
             PdfCanvasProcessor processor = new PdfCanvasProcessor(listener);
             processor.ProcessPageContent(pdfPage);
 
-            //var size = currentPage.GetPageSizeWithRotation();
+            ////var size = currentPage.GetPageSizeWithRotation();
             var size = pdfPage.GetPageSize();
 
             var width = size.GetWidth().PointsToPixels();
@@ -495,7 +484,7 @@ namespace PdfExtractor.Domains
                         {
                             font = new Font(textChunk.FontFamily, fontSize, textChunk.FontStyle, GraphicsUnit.Pixel);
                         }
-                        catch (Exception ex)
+                        catch
                         {
                             //log error
 
@@ -521,7 +510,7 @@ namespace PdfExtractor.Domains
         {
             List<MemoryStream> _listImage { get; set; } = new List<MemoryStream>();
 
-            StringBuilder _text = new StringBuilder();
+            readonly StringBuilder _text = new StringBuilder();
 
             public string GetText()
             {
@@ -556,7 +545,7 @@ namespace PdfExtractor.Domains
                 }
             }
 
-            public ICollection<EventType> GetSupportedEvents()
+            public ICollection<EventType>? GetSupportedEvents()
             {
                 return null;
             }

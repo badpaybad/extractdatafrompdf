@@ -21,6 +21,8 @@
             <Button Content="Retry parse failed" Name="btnRetryParseFailed"/>
             <Separator/>
             <Button Content="Retry upload failed"/>
+            <Separator/>
+            <Button Content="Logout" Name="btnLogout"/>
         </ToolBar>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

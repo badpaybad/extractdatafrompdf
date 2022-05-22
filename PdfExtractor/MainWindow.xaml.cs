@@ -21,27 +21,39 @@ namespace PdfExtractor
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        void ShowHideLoginForm()
         {
-            InitializeComponent();
-
-            var loginFrm = new LoginWindow();
-
             if (!MyAppContext.ReadToken())
             {
+                loginFrm = new LoginWindow();
+
                 loginFrm.ShowDialog();
 
                 if (loginFrm.DialogResult == null || loginFrm.DialogResult == false)
                 {
-                    Application.Current.Shutdown();
-                    return;
+                    Application.Current.Shutdown();                    
                 }
             }
             else
             {
                 loginFrm.Hide();
             }
+        }
 
+        LoginWindow loginFrm = new LoginWindow();
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            ShowHideLoginForm();
+
+            btnLogout.Click += (sender, e) =>
+            {
+                MyAppContext.Logout();
+               
+
+                ShowHideLoginForm();
+            };
 
 
             MyAppContext.Init(() =>
@@ -98,17 +110,24 @@ namespace PdfExtractor
 
         void DispatcherInvoke(Action callback)
         {
-            Dispatcher.Invoke(() =>
+            try
             {
-                try
+                Dispatcher.Invoke(() =>
                 {
-                    callback();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-            });
+                    try
+                    {
+                        callback();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                });
+            }
+            catch 
+            {
+                //
+            }
         }
 
         MyPdfPage _currentPageInPdf;
