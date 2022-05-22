@@ -10,11 +10,50 @@ namespace PdfExtractor.Domains
 {
     internal static class MyAppContext
     {
-        public static string Token { get; set; }
+        public static LogedInfo Token { get; set; }
         public static string CurrentFolder { get; set; }
         public static List<string> CurrentFiles { get; set; }
 
         public static List<PdfToImageProcessing> CurrentFilesToProcess { get; set; } = new List<PdfToImageProcessing>();
+
+        public class LogedInfo
+        {
+            public string Uid { get; set; }
+            public string Pwd { get; set; }
+            public string Token { get; set; }
+        }
+
+        public static bool Login(string uid, string pwd)
+        {
+            Token = new LogedInfo() { Uid = uid, Pwd = pwd };
+
+            using (var sw = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "remember.bin")))
+            {
+                StringCipher.StrEncript(JsonConvert.SerializeObject(Token), "Du@2022", out var encrypted);
+                sw.Write(encrypted);
+                sw.Flush();
+            }
+            return true;
+        }
+
+        public static bool ReadToken()
+        {
+            var temp = string.Empty;
+            string fiLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "remember.bin");
+            
+            if (!File.Exists(fiLog)) return false;
+
+            using (var sr = new StreamReader(fiLog))
+            {
+                temp = sr.ReadToEnd().Trim(new char[] { ' ', '\r', '\n' });
+            }
+
+            StringCipher.OmtDecript(temp, "Du@2022", out var decrypted);
+
+            Token = JsonConvert.DeserializeObject<LogedInfo>(decrypted);
+
+            return Token!=null;
+        }
 
         public static void Init(Action? callBack)
         {

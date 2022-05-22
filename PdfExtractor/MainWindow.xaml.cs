@@ -25,6 +25,25 @@ namespace PdfExtractor
         {
             InitializeComponent();
 
+            var loginFrm = new LoginWindow();
+
+            if (!MyAppContext.ReadToken())
+            {
+                loginFrm.ShowDialog();
+
+                if (loginFrm.DialogResult == null || loginFrm.DialogResult == false)
+                {
+                    Application.Current.Shutdown();
+                    return;
+                }
+            }
+            else
+            {
+                loginFrm.Hide();
+            }
+
+
+
             MyAppContext.Init(() =>
             {
                 this.BindFilesToListView();
@@ -32,7 +51,7 @@ namespace PdfExtractor
             });
 
             lsvFiles.SelectionChanged += LsvFiles_SelectionChanged;
-            
+
             //https://docs.google.com/spreadsheets/d/1Q3yQxR7sVtrCBa_HurPo8Ur2XSveaelMf7eZdDDeWDE/edit#gid=0
 
             lsvCurrentPdf.SelectionChanged += LsvCurrentPdf_SelectionChanged;
@@ -61,9 +80,10 @@ namespace PdfExtractor
 
         private void MyAppContext_OnAutoSave(int state)
         {
-            DispatcherInvoke(() => {
+            DispatcherInvoke(() =>
+            {
 
-                lblStatus.Content = "Auto save: "+(state==0?"Saving...":"Saved") +$" at {DateTime.Now}";
+                lblStatus.Content = "Auto save: " + (state == 0 ? "Saving..." : "Saved") + $" at {DateTime.Now}";
             });
         }
 
@@ -71,9 +91,9 @@ namespace PdfExtractor
         {
             if (_currentPdf == null) return;
 
-            _currentPdf.SetProperty("Code", txtCode.Text, null,-1);
-            _currentPdf.SetProperty("Title", txtTitle.Text, null,-1);
-            _currentPdf.SetProperty("SignedBy", txtSignedBy.Text, null,-1);
+            _currentPdf.SetProperty("Code", txtCode.Text, null, -1);
+            _currentPdf.SetProperty("Title", txtTitle.Text, null, -1);
+            _currentPdf.SetProperty("SignedBy", txtSignedBy.Text, null, -1);
         }
 
         void DispatcherInvoke(Action callback)
