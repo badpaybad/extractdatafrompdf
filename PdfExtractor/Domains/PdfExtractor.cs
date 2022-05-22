@@ -142,22 +142,16 @@ namespace PdfExtractor.Domains
                     {
                         var page = doc.GetPage(i);
 
-
                         ////PdfDictionary fontResources = page.GetResources().GetResource(PdfName.Font);
                         ////try
                         ////{
-
                         ////    foreach (PdfObject font in fontResources.Values(true))
                         ////    {
-
                         ////        if (font is PdfDictionary)
                         ////            fontResources.Put(PdfName.Encoding, PdfName.IdentityH);
                         ////    }
-
                         ////}
                         ////catch { }
-
-
 
                         ////ITextExtractionStrategy strategy = new LocationTextExtractionStrategy();
                         ////= new SimpleTextExtractionStrategy();
@@ -172,20 +166,16 @@ namespace PdfExtractor.Domains
                         ////using (var msw = new MemoryStream())
                         ////{
                         ////    PdfDocument pdf = new PdfDocument(new PdfWriter(new MemoryStream()));
-
                         ////    PdfFormXObject xobj = page.CopyAsFormXObject(pdf);
-
                         ////    ////iText.Layout.Element.Image image = new iText.Layout.Element.Image(xobj);
                         ////    ////iText.Layout.Document docx = new iText.Layout.Document(pdf);
-
                         ////}
 
                         MyPdfPage item = new MyPdfPage
                         {
                             ContentImages = eventListener.GetImages(),
                             PageIndex = i,
-                            ContentText = eventListener.GetText(),
-
+                            ContentText = TextAndImageExtractor.NormalizeText(eventListener.GetText())
                         };
 
                         pages.Add(item);
@@ -483,7 +473,7 @@ namespace PdfExtractor.Domains
                         return chunk;
                     })
                     .ToList();
-                _imgs.Clear(); 
+                _imgs.Clear();
 
                 var _txts = chunkDictionairy.Where(c => c.Value is TextChunk)
                     .Select(chunk =>
@@ -565,10 +555,35 @@ namespace PdfExtractor.Domains
                     )
                 {
                     TextRenderInfo txt = (TextRenderInfo)data;
-                    _text.Append(txt.GetText());
+                    _text.Append(NormalizeText(txt.GetText()));
                 }
             }
 
+            static char[] _split = { ' ', '\r', '\n' };
+
+            public static string NormalizeText(string text)
+            {
+                text = RemDuplicate(text, "  ", " ");
+                text = RemDuplicate(text, "\r \r", "\r");
+                text = RemDuplicate(text, "\r\r", "\r");
+                text = RemDuplicate(text, "\n \n", "\n");
+                text = RemDuplicate(text, "\n\n", "\n");
+                text = RemDuplicate(text, "\r\n \r\n", "\r\n");
+                text = RemDuplicate(text, "\r\n\r\n", "\r\n");
+
+                text = text.Trim(_split);
+                return text;
+
+                string RemDuplicate(string intxt, string toRem, string replaceBy)
+                {
+                    while (intxt.IndexOf(toRem) >= 0)
+                    {
+                        intxt = intxt.Replace(toRem, replaceBy);
+                    }
+
+                    return intxt;
+                }
+            }
             public ICollection<EventType> GetSupportedEvents()
             {
                 return new List<EventType>();

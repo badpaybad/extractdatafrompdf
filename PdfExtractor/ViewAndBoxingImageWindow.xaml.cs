@@ -201,10 +201,10 @@ namespace PdfExtractor
 
                     graphics.DrawRectangle(new System.Drawing.Pen(new System.Drawing.SolidBrush(_color), 2), box.Value);
                     graphics.DrawString(boxX.Key, new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
-                        , new SolidBrush(_color), box.Value.X, box.Value.Y);
+                        , new SolidBrush(_color), box.Value.X, box.Value.Y - 24);
 
                     graphics.DrawString(_imageMain.PdfProperties[boxX.Key], new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
-                        , new SolidBrush(_color), box.Value.X, box.Value.Y + box.Value.Height);
+                        , new SolidBrush(_color), box.Value.X, box.Value.Y );
                 }
 
             canvasBgImage.Source = ConvertFromBmp(_tempBitmap);

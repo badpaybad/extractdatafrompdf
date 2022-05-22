@@ -72,6 +72,11 @@ namespace PdfExtractor
             });
 
             MyAppContext.OnAutoSave += MyAppContext_OnAutoSave;
+
+            this.Closing += (sender, e) =>
+              {
+                  Application.Current.Shutdown();
+              };
         }
 
         void ShowHideLoginForm()

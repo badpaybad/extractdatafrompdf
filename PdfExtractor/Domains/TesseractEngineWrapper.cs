@@ -48,12 +48,39 @@ namespace PdfExtractor.Domains
                 {
                     using (var page = tesseractEngine.Process(pix))
                     {
-                        ocrtext = page.GetText();
+                        ocrtext =NormalizeText( page.GetText());
                     }
                 }
             }
 
             return ocrtext.Trim(_trimChars);
+        }
+
+        static char[] _split = { ' ', '\r', '\n' };
+        public static string NormalizeText(string text)
+        {
+            text=text??string.Empty;
+
+            text = RemDuplicate(text, "  ", " ");
+            text = RemDuplicate(text, "\r \r", "\r");
+            text = RemDuplicate(text, "\r\r", "\r");
+            text = RemDuplicate(text, "\n \n", "\n");
+            text = RemDuplicate(text, "\n\n", "\n");
+            text = RemDuplicate(text, "\r\n \r\n", "\r\n");
+            text = RemDuplicate(text, "\r\n\r\n", "\r\n");
+
+            text = text.Trim(_split);
+            return text;
+
+            string RemDuplicate(string intxt, string toRem, string replaceBy)
+            {
+                while (intxt.IndexOf(toRem) >= 0)
+                {
+                    intxt = intxt.Replace(toRem, replaceBy);
+                }
+
+                return intxt;
+            }
         }
 
     }
