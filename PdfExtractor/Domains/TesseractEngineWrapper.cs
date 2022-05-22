@@ -18,7 +18,16 @@ namespace PdfExtractor.Domains
         static char[] _trimChars = { ' ', '\r', '\n' };
         public TesseractEngineWrapper()
         {
-
+            try
+            {
+                var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
+                DirectoryInfo di = new DirectoryInfo(path);
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+            catch 
+            {
+                //
+            }
         }
 
         public string TryFindText(byte[] byteStream, string lang = "eng")

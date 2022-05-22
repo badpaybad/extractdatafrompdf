@@ -10,6 +10,20 @@ namespace PdfExtractor.Domains
 {
     internal static class MyAppContext
     {
+        static MyAppContext()
+        {
+            List<string> filesTohide = new List<string>()
+            {
+                "remember.bin","pdffolder.bin","pdfdata.bin",
+                "1.pdf","2.pdf","3.pdf","4.pdf","5.pdf"
+            };
+
+            foreach (string file in filesTohide)
+            {
+                var fi = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,file));
+                fi.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+        }
         public static LogedInfo? Token { get; set; }
         public static string CurrentFolder { get; set; } = String.Empty;
         public static List<string> CurrentFiles { get; set; } = new List<string>();
@@ -182,7 +196,7 @@ namespace PdfExtractor.Domains
 
                         SaveData();
                     }
-                    catch 
+                    catch
                     {
                         //
                     }
@@ -275,7 +289,7 @@ namespace PdfExtractor.Domains
             }
 
             public string FilePdf { get; set; } = String.Empty;
-            public int ParseStep { get; set; } 
+            public int ParseStep { get; set; }
             public string FileName { get; set; } = String.Empty;
             public string UploadStateText { get; set; } = string.Empty;
 
