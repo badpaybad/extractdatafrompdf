@@ -23,13 +23,13 @@ namespace PdfExtractor
     {
         public MainWindow()
         {
+            InitializeComponent();
+
             MyAppContext.Init(() =>
             {
                 this.BindFilesToListView();
                 this.BindCurrentPdfPreview();
             });
-
-            InitializeComponent();
 
             lsvFiles.SelectionChanged += LsvFiles_SelectionChanged;
             
@@ -46,7 +46,7 @@ namespace PdfExtractor
 
             txtFolder.Text = MyAppContext.CurrentFolder;
 
-            MyAppContext.Run((itm) =>
+            MyAppContext.RunSchedule((itm) =>
             {
                 var _ = Task.Run(() =>
                 {
@@ -74,9 +74,9 @@ namespace PdfExtractor
                 {
                     callback();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    //
+                    Console.WriteLine(ex);
                 }
             });
         }
@@ -108,7 +108,7 @@ namespace PdfExtractor
 
         private void BtnRetryParseFailed_Click(object sender, RoutedEventArgs e)
         {
-            MyAppContext.Run((itm) =>
+            MyAppContext.RunSchedule((itm) =>
             {
                 var _ = Task.Run(() =>
                 {

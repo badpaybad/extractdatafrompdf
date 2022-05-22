@@ -18,6 +18,7 @@ namespace PdfExtractor.Domains
 
         public static void Init(Action? callBack)
         {
+            LoadDataSaved();
             ////
             var temp = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pdffolder.bin");
             ///
@@ -25,10 +26,10 @@ namespace PdfExtractor.Domains
             {
                 using (var sr = new StreamReader(temp))
                 {
-                    CurrentFolder = sr.ReadToEnd().Trim(new char[] {' ','\r','\n'});
+                    CurrentFolder = sr.ReadToEnd().Trim(new char[] { ' ', '\r', '\n' });
                 }
 
-                BuildFiles();
+                AddFilesIfNotExisted();
             }
             //
 
@@ -39,56 +40,36 @@ namespace PdfExtractor.Domains
         {
             CurrentFolder = path.Replace("\\", "/");
 
+            CurrentFiles = new List<string>();
+            CurrentFilesToProcess = new List<PdfToImageProcessing>();
+
             using (var sw = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pdffolder.bin")))
             {
                 sw.WriteLine(CurrentFolder);
                 sw.Flush();
             }
 
-            BuildFiles();
+            AddFilesIfNotExisted();
         }
 
-        private static void BuildFiles()
+
+        static void AddFilesIfNotExisted()
         {
+            CurrentFiles = CurrentFiles ?? new List<string>();
+            CurrentFilesToProcess = CurrentFilesToProcess ?? new List<PdfToImageProcessing>();
+
             var dir = new DirectoryInfo(CurrentFolder);
-
-            CurrentFiles = new List<string>();
-            CurrentFilesToProcess = new List<PdfToImageProcessing>();
-
-            List<string> files = dir.GetFiles().Select(i=>i.FullName).ToList();
-
-            //files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
-          
-            foreach (var f in files)
-            {
-                if (f.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
-                {
-                    string file = f.Replace("\\", "/");
-                    
-                    CurrentFiles.Add(file);
-
-                    PdfToImageProcessing item = new PdfToImageProcessing(file);
-                    CurrentFilesToProcess.Add(item);
-                }
-            }
-
-        }
-
-        static void AddFileIfNotExisted()
-        {
-            var dir = new DirectoryInfo(CurrentFolder);
-
 
             List<string> files = dir.GetFiles().Select(i => i.FullName).ToList();
 
-            //files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
+            ////files = new List<string> { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "5.pdf") };
 
             foreach (var f in files)
             {
                 if (f.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) > 0)
                 {
                     var file = f.Replace("\\", "/");
-                    if(!CurrentFiles.Contains(file))
+                    if (!CurrentFiles.Contains(file))
                     {
                         CurrentFiles.Add(file);
 
@@ -106,7 +87,7 @@ namespace PdfExtractor.Domains
             _stop = true;
         }
 
-        public static void Run(Action<PdfToImageProcessing>? callBack)
+        public static void RunSchedule(Action<PdfToImageProcessing>? callBack)
         {
             _stop = false;
 
@@ -115,13 +96,13 @@ namespace PdfExtractor.Domains
 
                 await Task.Yield();
 
-                int threadConsume = (int)(Environment.ProcessorCount * 1) / 5 +1;
+                int threadConsume = (int)(Environment.ProcessorCount * 1) / 5 + 1;
 
                 while (!_stop)
                 {
                     try
                     {
-                        AddFileIfNotExisted();
+                        AddFilesIfNotExisted();
 
                         Parallel.ForEach(CurrentFilesToProcess, new ParallelOptions
                         {
@@ -130,7 +111,8 @@ namespace PdfExtractor.Domains
                         {
                             if (itm.ParseStep > 0) return;
 
-                            try {
+                            try
+                            {
 
                                 callBack?.Invoke(itm);
                                 itm.Prepare();
@@ -138,10 +120,13 @@ namespace PdfExtractor.Domains
                                 itm.Parse();
                                 callBack?.Invoke(itm);
                             }
-                            catch {
+                            catch
+                            {
                                 itm.Reset();
                             }
                         });
+
+                        SaveData();
                     }
                     catch (Exception ex)
                     {
@@ -152,6 +137,116 @@ namespace PdfExtractor.Domains
                 }
 
             });
+        }
+
+        static void LoadDataSaved()
+        {
+            try
+            {
+                string jsonData;
+                using (var sw = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pdfdata.bin")))
+                {
+                    jsonData = sw.ReadToEnd();
+                }
+
+                CurrentFilesToProcess = JsonConvert.DeserializeObject<List<DataInfo>>(jsonData)
+                    .Select(i => i.ToImageProcessing()).ToList();
+                CurrentFiles = CurrentFilesToProcess.Select(i => i.FilePdf).ToList();
+
+                var _ = Task.Run(() =>
+                {
+                    foreach (var p in CurrentFilesToProcess)
+                    {
+                        p.ConvertToPagesImages();
+                    }
+                });
+
+            }
+            catch
+            {
+                //
+            }
+
+        }
+
+        static bool isSaving = false;
+        static void SaveData()
+        {
+            if (isSaving) return;
+
+            isSaving = true;
+
+            var _ = Task.Run(async () =>
+            {
+                try
+                {
+                    using (var sw = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pdfdata.bin")))
+                    {
+                        sw.Write(JsonConvert.SerializeObject(CurrentFilesToProcess
+                            .Select(i => new DataInfo(i)).ToList()));
+                        sw.Flush();
+                    }
+                }
+                catch (Exception)
+                {
+                    //
+                }
+
+                isSaving = false;
+            });
+        }
+
+        public class DataInfo
+        {
+            public DataInfo()
+            {
+                //
+            }
+
+            public DataInfo(PdfToImageProcessing src)
+            {
+                FilePdf = src.FilePdf;
+                FileName = src.FileName;
+                ParseStep = src.ParseStep;
+                UploadStateText = src.UploadStateText;
+                Pages = src.Pages;
+                PdfProperties = src.PdfProperties;
+                PdfPropertiesRegion = src.PdfPropertiesRegion;
+                ContextText = src.ContextText;
+            }
+
+            public string FilePdf { get; set; }
+            public int ParseStep { get; set; }
+            public string FileName { get; set; }
+            public string UploadStateText { get; set; } = string.Empty;
+
+            public string ContextText { get; set; }
+
+            [JsonIgnore]
+            public List<MyPdfPage> Pages { get; set; } = new List<MyPdfPage>();
+
+            public Dictionary<string, string> PdfProperties { get; set; } = new Dictionary<string, string>();
+            public Dictionary<string, Dictionary<int, System.Drawing.Rectangle>> PdfPropertiesRegion { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle>>();
+
+            public PdfToImageProcessing ToImageProcessing()
+            {
+                var filePdf = FilePdf;
+
+                var temp = new PdfToImageProcessing(filePdf)
+                {
+                    FileName = this.FileName,
+                    ParseStep = this.ParseStep,
+                    UploadStateText = this.UploadStateText,
+                    PdfProperties = this.PdfProperties,
+                    PdfPropertiesRegion = this.PdfPropertiesRegion,
+                    ContextText = this.ContextText,
+
+                };
+
+                //temp.ConvertPagesImages();
+
+                return temp;
+            }
         }
     }
 }

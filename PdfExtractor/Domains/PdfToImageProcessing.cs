@@ -41,27 +41,16 @@ namespace PdfExtractor.Domains
             }
         }
 
-        public List<MyPdfPage> Pages
-        {
-            get
-            {
-
-                if (_pages == null) Prepare();
-
-                return _pages;
-            }
-        }
+        public List<MyPdfPage> Pages { get; set; } = new List<MyPdfPage>();
 
         readonly string _filepdf = string.Empty;
 
         TesseractEngineWrapper _ocr;
 
-        List<MyPdfPage> _pages = new List<MyPdfPage>();
-
         private readonly int _threadConsume = 1;
 
-        public Dictionary<string, string> PdfProperties = new Dictionary<string, string>();
-        public Dictionary<string, Dictionary<int, System.Drawing.Rectangle>> PdfPropertiesRegion = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle>>();
+        public Dictionary<string, string> PdfProperties { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, Dictionary<int, System.Drawing.Rectangle>> PdfPropertiesRegion { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle>>();
 
         public PdfToImageProcessing(string filePdf)
         {
@@ -79,7 +68,7 @@ namespace PdfExtractor.Domains
 
         public event Action<string, string, System.Drawing.Rectangle?>? OnSetProperty;
 
-        public void SetProperty(string propertyName, string value, System.Drawing.Rectangle? box,int boxInPageIdx)
+        public void SetProperty(string propertyName, string value, System.Drawing.Rectangle? box, int boxInPageIdx)
         {
             PdfProperties[propertyName] = value;
 
@@ -89,28 +78,39 @@ namespace PdfExtractor.Domains
             OnSetProperty?.Invoke(propertyName, value, box);
         }
 
+        public void ConvertToPagesImages()
+        {
+            Pages = Freeware.Pdf2Png.ConvertAllPages(File.OpenRead(_filepdf))
+              .Select((i, idx) =>
+              {
+                  var ps = new MemoryStream(i);
+                  var p = new MyPdfPage
+                  {
+                      PageStream = ps,
+                      PageBytes = i,
+                      PageIndex = idx + 1,
+                      PageImage = new System.Drawing.Bitmap(ps),
+                      ContentImages = new List<MemoryStream>(),
+                  };
+                  return p;
+              }).OrderBy(i => i.PageIndex).ToList();
+        }
+
         public List<MyPdfPage> Prepare()
         {
-            if (ParseStep > 0) return _pages;
+            if(Pages==null|| Pages.Count == 0)
+            {
+                ConvertToPagesImages();
+            }
+
+            if (ParseStep > 0) return Pages;
 
             ParseStep = 0;
-            _pages = Freeware.Pdf2Png.ConvertAllPages(File.OpenRead(_filepdf))
-                .Select((i, idx) =>
-                {
-                    var ps = new MemoryStream(i);
-                    var p = new MyPdfPage
-                    {
-                        PageStream = ps,
-                        PageBytes = i,
-                        PageIndex = idx+1,
-                        PageImage = new System.Drawing.Bitmap(ps),
-                        ContentImages = new List<MemoryStream>(),
-                    };
-                    return p;
-                }).OrderBy(i => i.PageIndex).ToList();
+          
+            ConvertToPagesImages();
 
             ParseStep = 1;
-            return _pages;
+            return Pages;
         }
 
         public event Action<int>? OnDoneParsePageIndex;
@@ -121,7 +121,7 @@ namespace PdfExtractor.Domains
 
             List<int> pres = new List<int> { };
 
-            Parallel.ForEach(_pages, new ParallelOptions { MaxDegreeOfParallelism = _threadConsume },
+            Parallel.ForEach(Pages, new ParallelOptions { MaxDegreeOfParallelism = _threadConsume },
                 p =>
             {
                 if (p.PageBytes == null || p.PageImage == null)
@@ -141,14 +141,14 @@ namespace PdfExtractor.Domains
 
             if (pres.Any(i => i == -1))
             {
-                _pages = null;
+                Pages = null;
                 ParseStep = -1;
                 return;
             }
 
             ParseStep = 2;
 
-            ContextText= string.Join("\r\n", _pages.Select(i => i.ContentText));
+            ContextText = string.Join("\r\n", Pages.Select(i => i.ContentText));
 
             ParseCode();
 
@@ -159,29 +159,28 @@ namespace PdfExtractor.Domains
             ParseStep = 6;
         }
 
-
         public void ParseCode()
         {
-
+            //SetProperty("Code")
             ParseStep = 3;
-
         }
 
         public void ParseTitle()
         {
-
+            //SetProperty("Title")
             ParseStep = 4;
         }
 
         public void ParseSignedBy()
         {
-
+            //SetProperty("SignedBy")
             ParseStep = 5;
         }
 
         public void Reset()
         {
-            _pages = null;
+            Pages = null;
+            Pages = new List<MyPdfPage>();
         }
     }
 }

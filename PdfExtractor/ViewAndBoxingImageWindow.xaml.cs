@@ -53,7 +53,7 @@ namespace PdfExtractor
             mainGrid.Width = canvasContainer.Height;
             this.Height = canvasContainer.Height;
 
-            mainGrid.Width = canvasContainer.Width + canvasContainer.Width * 0.5;
+            mainGrid.Width = canvasContainer.Width*1.3;
             this.Width = mainGrid.Width;
 
             this.ResizeMode = ResizeMode.NoResize;
