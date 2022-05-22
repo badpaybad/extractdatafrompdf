@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdfExtractor"
         mc:Ignorable="d"
-        Title="Select part of pdf" Height="450" Width="800">
+        Title="Select part of pdf" Height="450" Width="800" Icon="/mouse.jpg">
     <Grid x:Name="gridMain" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>

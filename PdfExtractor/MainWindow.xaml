@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdfExtractor"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1024">
+        Title="MainWindow" Height="600" Width="1024" Icon="/mouse.jpg">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="6*"></RowDefinition>

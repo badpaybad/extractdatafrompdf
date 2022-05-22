@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdfExtractor"
         mc:Ignorable="d"
-        Title="ViewAndBoxingImageWindow" Height="450" Width="800">
+        Title="ViewAndBoxingImageWindow" Height="450" Width="800" Icon="/mouse.jpg">
     <Grid Background="Transparent" 
            Name="mainGrid" HorizontalAlignment="Left" VerticalAlignment="Top" >
         <Grid.ColumnDefinitions>
