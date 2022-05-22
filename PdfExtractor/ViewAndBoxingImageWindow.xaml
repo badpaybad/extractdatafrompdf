@@ -7,16 +7,19 @@
         mc:Ignorable="d"
         Title="ViewAndBoxingImageWindow" Height="450" Width="800">
     <Grid Background="Transparent" 
-           Name="mainGrid" >
+           Name="mainGrid" HorizontalAlignment="Left" VerticalAlignment="Top" >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="70*"></ColumnDefinition>
-            <ColumnDefinition Width="30*"></ColumnDefinition>
+            <ColumnDefinition  Name="clmFullPage"></ColumnDefinition>
+            <ColumnDefinition Width="300"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="rowFullPage"></RowDefinition>
+        </Grid.RowDefinitions>
         <Grid x:Name="canvasContainer"
             Grid.Column="0" >
             <Image x:Name="canvasBgImage"  ></Image>
         </Grid>
-        <ListView Grid.Column="1" x:Name="lsvPdfProps">
+        <ListView Grid.Column="1" x:Name="lsvPdfProps" Width="300">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Style.Triggers>
@@ -52,6 +55,7 @@
                             <Button Grid.Column="0" Content="X" Click="btnDelete_OnClick"></Button>
                         </Grid>
                         <ScrollViewer Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,0"
+                                      Width="250" Height="100"
                                      Visibility="Visible" HorizontalScrollBarVisibility="Visible"
                                       VerticalScrollBarVisibility="Visible">
                             <TextBlock Text="{Binding Path=Value}" TextWrapping="Wrap" ></TextBlock>

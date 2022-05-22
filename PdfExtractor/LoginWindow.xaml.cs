@@ -33,7 +33,7 @@ namespace PdfExtractor
 
         private void LoginWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
-           
+           //
         }
 
         private void BtnLogin_Click(object sender, RoutedEventArgs e)
@@ -43,7 +43,7 @@ namespace PdfExtractor
 
         void LoadExistedToken()
         {
-
+            //
         }
     }
 }

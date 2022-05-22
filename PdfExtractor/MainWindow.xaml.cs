@@ -21,24 +21,8 @@ namespace PdfExtractor
     /// </summary>
     public partial class MainWindow : Window
     {
-        void ShowHideLoginForm()
-        {
-            if (!MyAppContext.ReadToken())
-            {
-                loginFrm = new LoginWindow();
-
-                loginFrm.ShowDialog();
-
-                if (loginFrm.DialogResult == null || loginFrm.DialogResult == false)
-                {
-                    Application.Current.Shutdown();                    
-                }
-            }
-            else
-            {
-                loginFrm.Hide();
-            }
-        }
+        PdfToImageProcessing? _currentPdf;
+        MyPdfPage? _currentPageInPdf;
 
         LoginWindow loginFrm = new LoginWindow();
         public MainWindow()
@@ -50,7 +34,7 @@ namespace PdfExtractor
             btnLogout.Click += (sender, e) =>
             {
                 MyAppContext.Logout();
-               
+
 
                 ShowHideLoginForm();
             };
@@ -90,6 +74,25 @@ namespace PdfExtractor
             MyAppContext.OnAutoSave += MyAppContext_OnAutoSave;
         }
 
+        void ShowHideLoginForm()
+        {
+            if (!MyAppContext.ReadToken())
+            {
+                loginFrm = new LoginWindow();
+
+                loginFrm.ShowDialog();
+
+                if (loginFrm.DialogResult == null || loginFrm.DialogResult == false)
+                {
+                    Application.Current.Shutdown();
+                }
+            }
+            else
+            {
+                loginFrm.Hide();
+            }
+        }
+
         private void MyAppContext_OnAutoSave(int state)
         {
             DispatcherInvoke(() =>
@@ -124,13 +127,13 @@ namespace PdfExtractor
                     }
                 });
             }
-            catch 
+            catch
             {
                 //
             }
         }
 
-        MyPdfPage _currentPageInPdf;
+
         private void LsvCurrentPdf_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (lsvCurrentPdf.SelectedItem != null)
@@ -170,7 +173,8 @@ namespace PdfExtractor
 
         private void BtnTryUpload_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentPdf == null) return;
+            ////if (_currentPdf == null) return;
+
         }
 
         private void BtnTryParse_Click(object sender, RoutedEventArgs e)
@@ -197,8 +201,6 @@ namespace PdfExtractor
 
         }
 
-
-        PdfToImageProcessing? _currentPdf;
 
         private void LsvFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -294,10 +296,12 @@ namespace PdfExtractor
                       lblCurrentPdfUploadStatus.Content = _currentPdf.UploadStateText;
 
                       lsvCurrentPdf.Items.Clear();
-                      foreach (var p in _currentPdf.Pages)
-                      {
-                          lsvCurrentPdf.Items.Add(p);
-                      }
+
+                      if (_currentPdf != null && _currentPdf.Pages != null)
+                          foreach (var p in _currentPdf.Pages)
+                          {
+                              lsvCurrentPdf.Items.Add(p);
+                          }
                   });
               });
         }

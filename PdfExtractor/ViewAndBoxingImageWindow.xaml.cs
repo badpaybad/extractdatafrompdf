@@ -49,13 +49,12 @@ namespace PdfExtractor
 
             canvasContainer.Width = canvasBgImage.Width;
             canvasContainer.Height = canvasBgImage.Height;
+            clmFullPage.Width =new GridLength(canvasBgImage.Width);
+            rowFullPage.Height= new GridLength(canvasBgImage.Height);
 
-            mainGrid.Width = canvasContainer.Height;
-            this.Height = canvasContainer.Height;
-
-            mainGrid.Width = canvasContainer.Width*1.3;
-            this.Width = mainGrid.Width;
-
+            mainGrid.Height = canvasBgImage.Height;
+            this.Height = canvasBgImage.Height;
+            this.Width = canvasBgImage.Width*1.4;
             this.ResizeMode = ResizeMode.NoResize;
 
             _tempBitmap = new Bitmap(_imageClicked.PageImage, (int)canvasBgImage.Width, (int)canvasBgImage.Height);
