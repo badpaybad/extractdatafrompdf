@@ -55,6 +55,16 @@ namespace PdfExtractor
                     this.BindCurrentPdfPreview();
                 });
             });
+
+            MyAppContext.OnAutoSave += MyAppContext_OnAutoSave;
+        }
+
+        private void MyAppContext_OnAutoSave(int state)
+        {
+            DispatcherInvoke(() => {
+
+                lblStatus.Content = "Auto save: "+(state==0?"Saving...":"Saved") +$" at {DateTime.Now}";
+            });
         }
 
         private void BtnUpdateModfiyBellow_Click(object sender, RoutedEventArgs e)

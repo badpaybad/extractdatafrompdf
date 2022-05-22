@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdfExtractor"
         mc:Ignorable="d"
-        Title="MainWindow" Height="576" Width="1024">
+        Title="MainWindow" Height="600" Width="1024">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="8*"></RowDefinition>
-            <RowDefinition Height="92*"></RowDefinition>
+            <RowDefinition Height="6*"></RowDefinition>
+            <RowDefinition Height="88*"></RowDefinition>
+            <RowDefinition Height="6*"></RowDefinition>
         </Grid.RowDefinitions>
+        <Label Grid.Row="2" Name="lblStatus"></Label>
         <ToolBar Grid.Row="0" BorderBrush="Black" BorderThickness="1">
             <Button Content="Logo - Company name"/>
             <Separator/>

@@ -169,12 +169,16 @@ namespace PdfExtractor.Domains
 
         }
 
+        public static event Action<int>? OnAutoSave;
+
         static bool isSaving = false;
         static void SaveData()
         {
             if (isSaving) return;
 
             isSaving = true;
+
+            OnAutoSave?.Invoke(0);
 
             var _ = Task.Run(async () =>
             {
@@ -193,6 +197,7 @@ namespace PdfExtractor.Domains
                 }
 
                 isSaving = false;
+                OnAutoSave?.Invoke(1);
             });
         }
 
