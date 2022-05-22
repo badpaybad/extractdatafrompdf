@@ -21,7 +21,7 @@ namespace PdfExtractor.Domains
             foreach (string file in filesTohide)
             {
                 var fi = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,file));
-                fi.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+                fi.Attributes =  FileAttributes.Hidden | FileAttributes.System;
             }
         }
         public static LogedInfo? Token { get; set; }

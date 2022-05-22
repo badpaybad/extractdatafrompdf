@@ -22,7 +22,7 @@ namespace PdfExtractor.Domains
             {
                 var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
                 DirectoryInfo di = new DirectoryInfo(path);
-                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden | FileAttributes.System ;
             }
             catch 
             {
