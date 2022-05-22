@@ -69,6 +69,7 @@ namespace PdfExtractor
             canvasBgImage.MouseMove += CanvasImageMain_MouseMove;
 
             DrawBoxes();
+            BindingListViewRight();
         }
 
         private void _imageMain_OnSetProperty(string arg1, string arg2, System.Drawing.Rectangle? arg3)

@@ -17,9 +17,18 @@
             <Image x:Name="canvasBgImage"  ></Image>
         </Grid>
         <ListView Grid.Column="1" x:Name="lsvPdfProps">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="IsSelected" Value="True"></Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <UniformGrid Columns="1"  VerticalAlignment="Stretch"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ListView.ItemTemplate>
@@ -33,14 +42,14 @@
                             <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70*" ></ColumnDefinition>
-                                <ColumnDefinition Width="10*" ></ColumnDefinition>
+                            <Grid.ColumnDefinitions>                                
+                                <ColumnDefinition Width="20*" ></ColumnDefinition>
                                 <ColumnDefinition Width="20*"></ColumnDefinition>
+                                <ColumnDefinition Width="60*" ></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Content="{Binding Path=Key}"></Label>
+                            <Label Grid.Column="2" Content="{Binding Path=Key}"></Label>
                             <Label Grid.Column="1" Content="{Binding Path=PageIndex}"></Label>
-                            <Button Grid.Column="2" Content="X" Click="btnDelete_OnClick"></Button>
+                            <Button Grid.Column="0" Content="X" Click="btnDelete_OnClick"></Button>
                         </Grid>
                         <ScrollViewer Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,0"
                                      Visibility="Visible" HorizontalScrollBarVisibility="Visible"
