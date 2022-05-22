@@ -188,7 +188,7 @@ namespace PdfExtractor.Domains
                         MyPdfPage item = new MyPdfPage
                         {
                             ContentImages = eventListener.GetImages(),
-                            PageIndex = i - 1,
+                            PageIndex = i,
                             ContentText = eventListener.GetText(),
 
                         };

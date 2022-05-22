@@ -102,7 +102,7 @@ namespace PdfExtractor.Domains
                     {
                         PageStream = ps,
                         PageBytes = i,
-                        PageIndex = idx,
+                        PageIndex = idx+1,
                         PageImage = new System.Drawing.Bitmap(ps),
                         ContentImages = new List<MemoryStream>(),
                     };

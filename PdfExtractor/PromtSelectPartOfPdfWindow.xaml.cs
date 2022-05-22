@@ -22,8 +22,11 @@ namespace PdfExtractor
     public partial class PromtSelectPartOfPdfWindow : Window
     {
         System.Drawing.Bitmap _croped;
-        public PromtSelectPartOfPdfWindow(System.Drawing.Bitmap croped)
+        PdfToImageProcessing _filPdf; MyPdfPage _pagePdf;
+        public PromtSelectPartOfPdfWindow(System.Drawing.Bitmap croped, PdfToImageProcessing filPdf, MyPdfPage pagePdf)
         {
+            _filPdf = filPdf;
+            _pagePdf = pagePdf; 
             _croped = croped;
 
             InitializeComponent();
@@ -57,6 +60,17 @@ namespace PdfExtractor
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
+            //if (_filPdf.PdfProperties.ContainsKey(ResponseType))
+            //{
+            //    if(System.Windows.MessageBox.Show($"{ResponseType} : Existed, REPLACE?", $"{ResponseType} : Existed, REPLACE?") 
+            //        != MessageBoxResult.OK)
+            //    {
+            //        txtCroped.Text = String.Empty;
+            //        DialogResult = false;
+            //        return;
+            //    }
+            //}
+
             DialogResult = true;
         }
 

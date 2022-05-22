@@ -151,8 +151,7 @@ namespace PdfExtractor
 
                 System.Drawing.Rectangle rect = new System.Drawing.Rectangle((int)Canvas.GetLeft(selectionBox), (int)Canvas.GetTop(selectionBox), (int)selectionBox.Width, (int)selectionBox.Height);
 
-
-                var prmt = new PromtSelectPartOfPdfWindow(CropImage(rect));
+                var prmt = new PromtSelectPartOfPdfWindow(CropImage(rect),_imageMain,_imageClicked);
 
                 if (prmt.ShowDialog() == true)
                 {
