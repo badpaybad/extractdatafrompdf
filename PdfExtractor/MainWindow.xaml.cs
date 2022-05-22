@@ -191,6 +191,7 @@ namespace PdfExtractor
 
             var _ = Task.Run(() =>
             {
+                _currentPdf.ParseStep = 1;
                 _currentPdf.Parse();
 
                 this.BindFilesToListView();

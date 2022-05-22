@@ -22,9 +22,9 @@ namespace PdfExtractor.Domains
             {
                 var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
                 DirectoryInfo di = new DirectoryInfo(path);
-                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden | FileAttributes.System ;
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden | FileAttributes.System;
             }
-            catch 
+            catch
             {
                 //
             }
@@ -57,7 +57,8 @@ namespace PdfExtractor.Domains
                 {
                     using (var page = tesseractEngine.Process(pix))
                     {
-                        ocrtext =NormalizeText( page.GetText());
+                        ////ocrtext =NormalizeText( page.GetText());
+                        ocrtext = page.GetText();
                     }
                 }
             }
@@ -68,7 +69,7 @@ namespace PdfExtractor.Domains
         static char[] _split = { ' ', '\r', '\n' };
         public static string NormalizeText(string text)
         {
-            text=text??string.Empty;
+            text = text ?? string.Empty;
 
             text = RemDuplicate(text, "  ", " ");
             text = RemDuplicate(text, "\r \r", "\r");

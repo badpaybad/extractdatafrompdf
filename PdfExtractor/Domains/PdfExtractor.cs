@@ -358,7 +358,7 @@ namespace PdfExtractor.Domains
                     ///var textRenderMode = character.GetTextRenderMode();
                     ///var opacity = character.GetGraphicsState().GetFillOpacity();
 
-                    string letter = character.GetText();
+                    string letter = TextAndImageExtractor.NormalizeText(character.GetText());
 
                     Color color;
 
