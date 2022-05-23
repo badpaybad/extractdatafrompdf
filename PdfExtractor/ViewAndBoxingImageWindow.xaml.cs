@@ -38,6 +38,8 @@ namespace PdfExtractor
         {
             _imageMain = imageMain;
 
+            _imageMain.SetRatioResize(_ratioResize);
+
             _imageMain.OnSetProperty += _imageMain_OnSetProperty;
 
             _imageClicked = imageClicked;

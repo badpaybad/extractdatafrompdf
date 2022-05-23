@@ -77,6 +77,17 @@ namespace PdfExtractor
               {
                   Application.Current.Shutdown();
               };
+
+            btnSetAsTemplate.Click += (sender, e) =>
+            {
+                if (_currentPdf == null || _currentPdf.RatioResize <= 0) return;
+
+                MyAppContext.SetAsTemplate(new MyAppContext.TemplateCropImageText
+                {
+                    RatioResize = _currentPdf.RatioResize,
+                    CropArea = _currentPdf.PdfPropertiesRegion
+                });
+            };
         }
 
         void ShowHideLoginForm()

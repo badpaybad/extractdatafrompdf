@@ -141,10 +141,12 @@
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0"  Content="Update modify bellow" Name="btnUpdateModfiyBellow" ></Button>
                     <Button Grid.Column="1"  Content="Try parse" Name="btnTryParse"></Button>
-                    <Button Grid.Column="2"  Content="Try upload" Name="btnTryUpload"></Button>                    
+                    <Button Grid.Column="2"  Content="Try upload" Name="btnTryUpload"></Button>
+                    <Button Grid.Column="3"  Content="Set as template" Name="btnSetAsTemplate"></Button>
                 </Grid>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>                        

@@ -31,6 +31,27 @@ namespace PdfExtractor.Domains
                 }
             }
         }
+
+        public class TemplateCropImageText
+        {
+            public int RatioResize { get; set; }
+            public Dictionary<string, Dictionary<int, System.Drawing.Rectangle>> CropArea { get; set; }
+        }
+
+        static TemplateCropImageText? _template = null;
+
+        public static TemplateCropImageText GetTemplate()
+        {
+            if (_template == null) return new TemplateCropImageText();
+
+            return _template;
+        }
+
+        public static void SetAsTemplate(TemplateCropImageText template)
+        {
+            _template = template;
+        }
+
         public static LogedInfo? Token { get; set; }
         public static string CurrentFolder { get; set; } = String.Empty;
         public static List<string> CurrentFiles { get; set; } = new List<string>();
@@ -293,8 +314,9 @@ namespace PdfExtractor.Domains
                 PdfProperties = src.PdfProperties;
                 PdfPropertiesRegion = src.PdfPropertiesRegion;
                 ContextText = src.ContextText;
+                RatioResize = src.RatioResize;
             }
-
+            public int RatioResize { get; set; }
             public string FilePdf { get; set; } = String.Empty;
             public int ParseStep { get; set; }
             public string FileName { get; set; } = String.Empty;
@@ -320,7 +342,7 @@ namespace PdfExtractor.Domains
                     PdfProperties = this.PdfProperties,
                     PdfPropertiesRegion = this.PdfPropertiesRegion,
                     ContextText = this.ContextText,
-
+                    RatioResize = this.RatioResize,
                 };
 
                 ////temp.ConvertPagesImages();

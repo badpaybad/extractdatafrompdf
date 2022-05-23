@@ -68,8 +68,15 @@ namespace PdfExtractor.Domains
 
         public event Action<string, string, System.Drawing.Rectangle?>? OnSetProperty;
 
+        public int RatioResize { get; set; }
+
+        public void SetRatioResize(int ratioResize)
+        {
+            RatioResize = ratioResize;
+        }
         public void SetProperty(string propertyName, string value, System.Drawing.Rectangle? box, int boxInPageIdx)
         {
+
             PdfProperties[propertyName] = value;
 
             if (box != null)
@@ -98,7 +105,7 @@ namespace PdfExtractor.Domains
 
         public List<MyPdfPage> Prepare()
         {
-            if(Pages==null|| Pages.Count == 0)
+            if (Pages == null || Pages.Count == 0)
             {
                 ConvertToPagesImages();
             }
@@ -106,7 +113,7 @@ namespace PdfExtractor.Domains
             if (ParseStep > 0) return Pages;
 
             ParseStep = 0;
-          
+
             ConvertToPagesImages();
 
             ParseStep = 1;
@@ -159,20 +166,100 @@ namespace PdfExtractor.Domains
             ParseStep = 6;
         }
 
+        System.Drawing.Bitmap CropImage(System.Drawing.Bitmap src, System.Drawing.Rectangle cropArea)
+        {
+            if (RatioResize <= 0) return new System.Drawing.Bitmap(1, 1);
+
+            var bmpImage = src;
+
+            return bmpImage.Clone(new System.Drawing.Rectangle((int)cropArea.X * RatioResize, (int)cropArea.Y * RatioResize, (int)cropArea.Width * RatioResize, (int)cropArea.Height * RatioResize), bmpImage.PixelFormat);
+        }
+
+        string GetTextByTemplate(string propName, out int pageIdx, out System.Drawing.Rectangle box)
+        {
+            pageIdx = -1;
+            box = new System.Drawing.Rectangle();
+
+            if (RatioResize <= 0) return string.Empty;
+
+            var template = MyAppContext.GetTemplate();
+
+            var minPage = template.CropArea.SelectMany(i => i.Value).Min(i => i.Key);
+            var maxPage = template.CropArea.SelectMany(i => i.Value).Max(i => i.Key);
+
+            var text = string.Empty;
+
+            if (template.CropArea.TryGetValue(propName, out var value))
+            {
+                var boxing = value.FirstOrDefault();
+
+                box = boxing.Value;
+
+                if (boxing.Key == minPage)
+                {
+                    MyPdfPage? myPdfPage = Pages.FirstOrDefault();
+
+                    if (myPdfPage != null && myPdfPage.PageImage != null)
+                        text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box));
+
+                    //first page
+                    pageIdx = 1;
+                }
+                else if (boxing.Key == maxPage)
+                {
+                    MyPdfPage? myPdfPage = Pages.LastOrDefault();
+
+                    if (myPdfPage != null && myPdfPage.PageImage != null)
+                        text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box));
+
+                    pageIdx = Pages.Count;
+                    //last page
+                }
+                else
+                {
+                    //page index
+                    pageIdx = boxing.Key;
+
+                    if (pageIdx > 0 && pageIdx < Pages.Count)
+                    {
+                        MyPdfPage? myPdfPage = Pages[pageIdx - 1];
+
+                        if (myPdfPage != null && myPdfPage.PageImage != null)
+                            text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box));
+
+                    }
+
+                }
+            }
+
+            return text;
+        }
+
         public void ParseCode()
         {
             //SetProperty("Code")
+
+            var text = GetTextByTemplate("Code", out int pageIdx, out System.Drawing.Rectangle box);
+
+            SetProperty("Code", text, box, pageIdx);
+
             ParseStep = 3;
         }
 
         public void ParseTitle()
         {
+            var text = GetTextByTemplate("Title", out int pageIdx, out System.Drawing.Rectangle box);
+
+            SetProperty("Title", text, box, pageIdx);
             //SetProperty("Title")
             ParseStep = 4;
         }
 
         public void ParseSignedBy()
         {
+            var text = GetTextByTemplate("SignedBy", out int pageIdx, out System.Drawing.Rectangle box);
+
+            SetProperty("SignedBy", text, box, pageIdx);
             //SetProperty("SignedBy")
             ParseStep = 5;
         }
