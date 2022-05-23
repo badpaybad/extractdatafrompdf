@@ -23,7 +23,7 @@
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="1" Content="Ok" Name="btnOk"></Button>
+            <Button Cursor="Hand"  Grid.Column="1" Content="Ok" Name="btnOk"></Button>
             <Image Grid.Column="0" Name="imgCroped" Stretch="Fill"></Image>
         </Grid>
     </Grid>

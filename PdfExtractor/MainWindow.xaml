@@ -14,21 +14,21 @@
         </Grid.RowDefinitions>
         <Label Grid.Row="2" Name="lblStatus"></Label>
         <ToolBar Grid.Row="0" BorderBrush="Black" BorderThickness="1">
-            <Button Content="Logo - Company name"/>
+            <Button  Cursor="Hand" Content="Logo - Company name"/>
             <Separator/>
-            <Button Content="View logs"/>
+            <Button Cursor="Hand" Content="View logs"/>
             <Separator/>
-            <Button Content="Retry parse failed" Name="btnRetryParseFailed"/>
+            <Button Cursor="Hand" Content="Retry parse failed" Name="btnRetryParseFailed"/>
             <Separator/>
-            <Button Content="Retry upload failed"/>
+            <Button  Cursor="Hand" Content="Retry upload failed"/>
             <Separator/>
-            <Button Content="Logout" Name="btnLogout"/>
+            <Button  Cursor="Hand" Content="Logout" Name="btnLogout"/>
         </ToolBar>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="35*">
                 </ColumnDefinition>
-                <ColumnDefinition Width="25*" >                    
+                <ColumnDefinition Width="25*" >
                 </ColumnDefinition>
                 <ColumnDefinition Width="40*">
                 </ColumnDefinition>
@@ -47,7 +47,7 @@
                     <TextBox x:Name="txtFolder" HorizontalAlignment="Left"  TextWrapping="Wrap" 
                          Grid.Column="0" >
                     </TextBox>
-                    <Button Grid.Column="1" x:Name="btnChangeFolder" Content="Change folder"  Click="btnChangeFolder_Click"/>
+                    <Button Cursor="Hand" Grid.Column="1" x:Name="btnChangeFolder" Content="Change folder"  Click="btnChangeFolder_Click"/>
                 </Grid>
                 <ListView x:Name="lsvFiles" Grid.Row="1" BorderBrush="Black" BorderThickness="1" >
                     <ListView.View>
@@ -120,7 +120,7 @@
                                             <RowDefinition></RowDefinition>
                                         </Grid.RowDefinitions>
                                         <Label Grid.Row="0"  Content="{Binding Path=PageIndex}" HorizontalAlignment="Center" VerticalAlignment="Bottom"></Label>
-                                        <Button Grid.Row="1" Content="Custom view &#xa;Extract data" Click="lsvViewImage_Click"></Button>
+                                        <Button Cursor="Hand" Grid.Row="1" Content="Custom view &#xa;Extract data" Click="lsvViewImage_Click"></Button>
                                     </Grid>
 
                                 </Grid>
@@ -143,13 +143,13 @@
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0"  Content="Update modify bellow" Name="btnUpdateModfiyBellow" ></Button>
-                    <Button Grid.Column="1"  Content="Try parse" Name="btnTryParse"></Button>
-                    <Button Grid.Column="2"  Content="Try upload" Name="btnTryUpload"></Button>
-                    <Button Grid.Column="3"  Content="Set as template" Name="btnSetAsTemplate"></Button>
+                    <Button Grid.Column="0"  Content="Update modify bellow" Name="btnUpdateModfiyBellow" Cursor="Hand" ></Button>
+                    <Button Grid.Column="1"  Content="Try parse" Name="btnTryParse"  Cursor="Hand"></Button>
+                    <Button Grid.Column="2"  Content="Try upload" Name="btnTryUpload" Cursor="Hand"></Button>
+                    <Button Grid.Column="3"  Content="Set as template" Name="btnSetAsTemplate" Cursor="Hand"></Button>
                 </Grid>
                 <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>                        
+                    <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="20*"></ColumnDefinition>
                         <ColumnDefinition Width="80*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>

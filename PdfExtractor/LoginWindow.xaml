@@ -25,6 +25,6 @@
         <TextBox Grid.Row="1" Grid.Column="2" Text="" Margin="20" Name="txtUid"></TextBox>
         <Label Grid.Row="2" Grid.Column="1" Content="Password or Token" Margin="20"></Label>
         <TextBox Grid.Row="2" Grid.Column="2" Text="" Margin="20" Name="txtPwd"></TextBox>
-        <Button Grid.Column="2" Grid.Row="3" Content="Ok" Name="btnLogin" Margin="20"></Button>
+        <Button Cursor="Hand" Grid.Column="2" Grid.Row="3" Content="Ok" Name="btnLogin" Margin="20"></Button>
     </Grid>
 </Window>

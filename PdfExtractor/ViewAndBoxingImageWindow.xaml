@@ -52,7 +52,7 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="2" Content="{Binding Path=Key}"></Label>
                             <Label Grid.Column="1" Content="{Binding Path=PageIndex}"></Label>
-                            <Button Grid.Column="0" Content="X" Click="btnDelete_OnClick"></Button>
+                            <Button Cursor="Hand"  Grid.Column="0" Content="X" Click="btnDelete_OnClick"></Button>
                         </Grid>
                         <ScrollViewer Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,0"
                                       Width="250" Height="100"
