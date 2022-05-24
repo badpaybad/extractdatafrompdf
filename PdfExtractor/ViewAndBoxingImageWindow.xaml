@@ -72,7 +72,7 @@
             <Rectangle
                 x:Name="selectionBox"
                 Visibility="Collapsed"
-                Stroke="Black"
+                Stroke="Red"
                 StrokeThickness="1"
                 />
         </Canvas>

@@ -218,7 +218,6 @@ namespace PdfExtractor
 
         }
 
-
         private void LsvFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (lsvFiles.SelectedItem != null)

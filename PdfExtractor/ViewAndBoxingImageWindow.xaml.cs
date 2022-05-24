@@ -51,12 +51,12 @@ namespace PdfExtractor
 
             canvasContainer.Width = canvasBgImage.Width;
             canvasContainer.Height = canvasBgImage.Height;
-            clmFullPage.Width =new GridLength(canvasBgImage.Width);
-            rowFullPage.Height= new GridLength(canvasBgImage.Height);
+            clmFullPage.Width = new GridLength(canvasBgImage.Width);
+            rowFullPage.Height = new GridLength(canvasBgImage.Height);
 
             mainGrid.Height = canvasBgImage.Height;
             this.Height = canvasBgImage.Height;
-            this.Width = canvasBgImage.Width*1.4;
+            this.Width = canvasBgImage.Width * 1.4;
             this.ResizeMode = ResizeMode.NoResize;
 
             _tempBitmap = new Bitmap(_imageClicked.PageImage, (int)canvasBgImage.Width, (int)canvasBgImage.Height);
@@ -152,12 +152,12 @@ namespace PdfExtractor
 
                 System.Drawing.Rectangle rect = new System.Drawing.Rectangle((int)Canvas.GetLeft(selectionBox), (int)Canvas.GetTop(selectionBox), (int)selectionBox.Width, (int)selectionBox.Height);
 
-                var prmt = new PromtSelectPartOfPdfWindow(CropImage(rect),_imageMain,_imageClicked);
+                var prmt = new PromtSelectPartOfPdfWindow(CropImage(rect), _imageMain, _imageClicked);
 
                 if (prmt.ShowDialog() == true)
                 {
                     if (!string.IsNullOrEmpty(prmt.ResponseText) && !string.IsNullOrEmpty(prmt.ResponseType))
-                    {                        
+                    {
                         _imageMain.SetProperty(prmt.ResponseType, prmt.ResponseText, rect, _imageClicked.PageIndex);
                     }
                 }
@@ -197,16 +197,20 @@ namespace PdfExtractor
             using (Graphics graphics = Graphics.FromImage(_tempBitmap))
                 foreach (var boxX in _imageMain.PdfPropertiesRegion)
                 {
-                    var box=boxX.Value.FirstOrDefault();
+                    var box = boxX.Value.FirstOrDefault();
 
                     if (_imageClicked.PageIndex != box.Key) continue;
 
-                    graphics.DrawRectangle(new System.Drawing.Pen(new System.Drawing.SolidBrush(_color), 2), box.Value);
+                    if (box.Value == null) continue;
+
+                    var ret = box.Value.Value;
+
+                    graphics.DrawRectangle(new System.Drawing.Pen(new System.Drawing.SolidBrush(_color), 2), ret);
                     graphics.DrawString(boxX.Key, new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
-                        , new SolidBrush(_color), box.Value.X, box.Value.Y - 24);
+                        , new SolidBrush(_color), ret.X, ret.Y - 24);
 
                     graphics.DrawString(_imageMain.PdfProperties[boxX.Key], new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Regular)
-                        , new SolidBrush(_color), box.Value.X, box.Value.Y );
+                        , new SolidBrush(_color), ret.X, ret.Y);
                 }
 
             canvasBgImage.Source = ConvertFromBmp(_tempBitmap);
@@ -220,8 +224,12 @@ namespace PdfExtractor
 
                 foreach (var i in _imageMain.PdfProperties)
                 {
-                    lsvPdfProps.Items.Add(new MyKeyValue { Key = i.Key, Value = i.Value
-                        ,PageIndex= _imageMain.PdfPropertiesRegion[i.Key].FirstOrDefault().Key
+                    lsvPdfProps.Items.Add(new MyKeyValue
+                    {
+                        Key = i.Key,
+                        Value = i.Value
+                        ,
+                        PageIndex = _imageMain.PdfPropertiesRegion[i.Key].FirstOrDefault().Key
                     });
                 }
             });

@@ -50,7 +50,7 @@ namespace PdfExtractor.Domains
         private readonly int _threadConsume = 1;
 
         public Dictionary<string, string> PdfProperties { get; set; } = new Dictionary<string, string>();
-        public Dictionary<string, Dictionary<int, System.Drawing.Rectangle>> PdfPropertiesRegion { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle>>();
+        public Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>> PdfPropertiesRegion { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>>();
 
         public PdfToImageProcessing(string filePdf)
         {
@@ -80,37 +80,46 @@ namespace PdfExtractor.Domains
             PdfProperties[propertyName] = value;
 
             if (box != null)
-                PdfPropertiesRegion[propertyName] = new Dictionary<int, System.Drawing.Rectangle>() { { boxInPageIdx, box.Value } };
+                PdfPropertiesRegion[propertyName] = new Dictionary<int, System.Drawing.Rectangle?>() { { boxInPageIdx, box.Value } };
 
             OnSetProperty?.Invoke(propertyName, value, box);
         }
 
         public void ConvertToPagesImages()
         {
-            Pages = Freeware.Pdf2Png.ConvertAllPages(File.OpenRead(_filepdf))
-              .Select((i, idx) =>
-              {
-                  var ps = new MemoryStream(i);
-                  var p = new MyPdfPage
-                  {
-                      PageStream = ps,
-                      PageBytes = i,
-                      PageIndex = idx + 1,
-                      PageImage = new System.Drawing.Bitmap(ps),
-                      ContentImages = new List<MemoryStream>(),
-                  };
-                  return p;
-              }).OrderBy(i => i.PageIndex).ToList();
+            var listFileInByte = Freeware.Pdf2Png.ConvertAllPages(File.OpenRead(_filepdf));
+
+            Pages = new List<MyPdfPage>();
+
+            for (int idx = 0; idx < listFileInByte.Count; idx++)
+            {
+                byte[]? i = listFileInByte[idx];
+                var ps = new MemoryStream(i);
+                var p = new MyPdfPage
+                {
+                    PageStream = ps,
+                    PageBytes = i,
+                    PageIndex = idx + 1,
+                    PageImage = new System.Drawing.Bitmap(ps),
+                    ContentImages = new List<MemoryStream>(),
+                };
+                Pages.Add(p);
+            }
+
+            Pages = Pages.OrderBy(i => i.PageIndex).ToList();
         }
 
         public List<MyPdfPage> Prepare()
         {
-            if (Pages == null || Pages.Count == 0)
+            if (ParseStep > 0)
             {
-                ConvertToPagesImages();
-            }
+                if (Pages == null || Pages.Count == 0)
+                {
+                    ConvertToPagesImages();
+                }
 
-            if (ParseStep > 0) return Pages;
+                return Pages ?? new List<MyPdfPage>();
+            }
 
             ParseStep = 0;
 
@@ -175,10 +184,10 @@ namespace PdfExtractor.Domains
             return bmpImage.Clone(new System.Drawing.Rectangle((int)cropArea.X * RatioResize, (int)cropArea.Y * RatioResize, (int)cropArea.Width * RatioResize, (int)cropArea.Height * RatioResize), bmpImage.PixelFormat);
         }
 
-        string GetTextByTemplate(string propName, out int pageIdx, out System.Drawing.Rectangle box)
+        string GetTextByTemplate(string propName, out int pageIdx, out System.Drawing.Rectangle? box)
         {
             pageIdx = -1;
-            box = new System.Drawing.Rectangle();
+            box = null;
 
             if (RatioResize <= 0) return string.Empty;
 
@@ -194,13 +203,14 @@ namespace PdfExtractor.Domains
                 var boxing = value.FirstOrDefault();
 
                 box = boxing.Value;
+                
 
                 if (boxing.Key == minPage)
                 {
                     MyPdfPage? myPdfPage = Pages.FirstOrDefault();
 
-                    if (myPdfPage != null && myPdfPage.PageImage != null)
-                        text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box));
+                    if (myPdfPage != null && myPdfPage.PageImage != null && box != null)
+                        text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box.Value));
 
                     //first page
                     pageIdx = 1;
@@ -209,8 +219,8 @@ namespace PdfExtractor.Domains
                 {
                     MyPdfPage? myPdfPage = Pages.LastOrDefault();
 
-                    if (myPdfPage != null && myPdfPage.PageImage != null)
-                        text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box));
+                    if (myPdfPage != null && myPdfPage.PageImage != null && box != null)
+                        text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box.Value));
 
                     pageIdx = Pages.Count;
                     //last page
@@ -224,8 +234,8 @@ namespace PdfExtractor.Domains
                     {
                         MyPdfPage? myPdfPage = Pages[pageIdx - 1];
 
-                        if (myPdfPage != null && myPdfPage.PageImage != null)
-                            text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box));
+                        if (myPdfPage != null && myPdfPage.PageImage != null && box != null)
+                            text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box.Value));
 
                     }
 
@@ -239,7 +249,7 @@ namespace PdfExtractor.Domains
         {
             //SetProperty("Code")
 
-            var text = GetTextByTemplate("Code", out int pageIdx, out System.Drawing.Rectangle box);
+            var text = GetTextByTemplate("Code", out int pageIdx, out System.Drawing.Rectangle? box);
 
             SetProperty("Code", text, box, pageIdx);
 
@@ -248,7 +258,7 @@ namespace PdfExtractor.Domains
 
         public void ParseTitle()
         {
-            var text = GetTextByTemplate("Title", out int pageIdx, out System.Drawing.Rectangle box);
+            var text = GetTextByTemplate("Title", out int pageIdx, out System.Drawing.Rectangle? box);
 
             SetProperty("Title", text, box, pageIdx);
             //SetProperty("Title")
@@ -257,7 +267,7 @@ namespace PdfExtractor.Domains
 
         public void ParseSignedBy()
         {
-            var text = GetTextByTemplate("SignedBy", out int pageIdx, out System.Drawing.Rectangle box);
+            var text = GetTextByTemplate("SignedBy", out int pageIdx, out System.Drawing.Rectangle? box);
 
             SetProperty("SignedBy", text, box, pageIdx);
             //SetProperty("SignedBy")

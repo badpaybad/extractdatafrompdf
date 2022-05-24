@@ -35,7 +35,7 @@ namespace PdfExtractor.Domains
         public class TemplateCropImageText
         {
             public int RatioResize { get; set; }
-            public Dictionary<string, Dictionary<int, System.Drawing.Rectangle>> CropArea { get; set; }
+            public Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>> CropArea { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>>();
         }
 
         static TemplateCropImageText? _template = null;
@@ -234,11 +234,13 @@ namespace PdfExtractor.Domains
 
             });
         }
-
+        static DateTime _lastSave = DateTime.MinValue;
         static void LoadDataSaved()
         {
             try
             {
+                if (DateTime.Now.Subtract(_lastSave).Seconds < 5) return;
+
                 string jsonData;
                 using (var sw = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pdfdata.bin")))
                 {
@@ -253,6 +255,8 @@ namespace PdfExtractor.Domains
                 {
                     foreach (var p in CurrentFilesToProcess)
                     {
+                        if (p.Pages.Count > 0) continue;
+
                         p.ConvertToPagesImages();
                     }
                 });
@@ -328,7 +332,7 @@ namespace PdfExtractor.Domains
             public List<MyPdfPage> Pages { get; set; } = new List<MyPdfPage>();
 
             public Dictionary<string, string> PdfProperties { get; set; } = new Dictionary<string, string>();
-            public Dictionary<string, Dictionary<int, System.Drawing.Rectangle>> PdfPropertiesRegion { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle>>();
+            public Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>> PdfPropertiesRegion { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>>();
 
             public PdfToImageProcessing ToImageProcessing()
             {
