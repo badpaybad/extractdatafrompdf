@@ -60,7 +60,11 @@ namespace PdfExtractor
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            //if (_filPdf.PdfProperties.ContainsKey(ResponseType))
+            if (string.IsNullOrEmpty(ResponseType))
+            {
+                System.Windows.MessageBox.Show("Should check an type");
+                return;
+            }
             //{
             //    if(System.Windows.MessageBox.Show($"{ResponseType} : Existed, REPLACE?", $"{ResponseType} : Existed, REPLACE?") 
             //        != MessageBoxResult.OK)
