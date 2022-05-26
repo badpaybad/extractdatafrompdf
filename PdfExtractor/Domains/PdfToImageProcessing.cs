@@ -172,7 +172,11 @@ namespace PdfExtractor.Domains
 
             ParseSignedBy();
 
-            ParseStep = 6;
+            ParseDate();
+
+            ParseSignedAt();
+
+            ParseStep = ParseStep + 1;
         }
 
         System.Drawing.Bitmap CropImage(System.Drawing.Bitmap src, System.Drawing.Rectangle cropArea)
@@ -203,7 +207,7 @@ namespace PdfExtractor.Domains
                 var boxing = value.FirstOrDefault();
 
                 box = boxing.Value;
-                
+
 
                 if (boxing.Key == minPage)
                 {
@@ -245,6 +249,7 @@ namespace PdfExtractor.Domains
             return text;
         }
 
+
         public void ParseCode()
         {
             //SetProperty("Code")
@@ -274,6 +279,26 @@ namespace PdfExtractor.Domains
             ParseStep = 5;
         }
 
+
+        public void ParseDate()
+        {
+            //SetProperty("Code")
+
+            var text = GetTextByTemplate("Date", out int pageIdx, out System.Drawing.Rectangle? box);
+
+            SetProperty("Date", text, box, pageIdx);
+
+            ParseStep = 6;
+        }
+
+        public void ParseSignedAt()
+        {
+            var text = GetTextByTemplate("SignedAt", out int pageIdx, out System.Drawing.Rectangle? box);
+
+            SetProperty("SignedAt", text, box, pageIdx);
+            //SetProperty("SignedBy")
+            ParseStep = 7;
+        }
         public void Reset()
         {
             Pages = null;
