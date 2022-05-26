@@ -125,6 +125,8 @@ namespace PdfExtractor
             _currentPdf.SetProperty("Code", txtCode.Text, null, -1);
             _currentPdf.SetProperty("Title", txtTitle.Text, null, -1);
             _currentPdf.SetProperty("SignedBy", txtSignedBy.Text, null, -1);
+            _currentPdf.SetProperty("Date", txtDate.Text, null, -1);
+            _currentPdf.SetProperty("SignedAt", txtSignedDate.Text, null, -1);
         }
 
         void DispatcherInvoke(Action callback)
