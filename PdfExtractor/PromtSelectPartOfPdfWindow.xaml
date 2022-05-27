@@ -16,7 +16,7 @@
                 <RowDefinition ></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <Image Grid.Column="0" Name="imgCroped" Stretch="Fill"></Image>
+            <Image Grid.Column="0" Name="imgCroped" Stretch="Uniform"></Image>
             <TextBox Grid.Row="1" Name="txtCroped" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" ></TextBox>
         </Grid>
         <Grid Grid.Column="1" x:Name="gridMain" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">

@@ -294,6 +294,12 @@ namespace PdfExtractor
                     _currentPdf.PdfProperties.TryGetValue("SignedBy", out var signedBy);
                     txtSignedBy.Text = signedBy;
 
+                    _currentPdf.PdfProperties.TryGetValue("SignedAt", out var signedAt);
+                    txtSignedDate.Text = signedAt;
+
+                    _currentPdf.PdfProperties.TryGetValue("Date", out var date);
+                    txtDate.Text = date;
+
                     _currentPdf.ContextText = txtPdfContentText.Text;
 
                 });
