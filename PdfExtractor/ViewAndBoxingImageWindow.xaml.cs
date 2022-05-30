@@ -71,7 +71,20 @@ namespace PdfExtractor
 
             DrawBoxes();
             BindingListViewRight();
+
+            
         }
+
+        public void txtValueInListView_OnChange(object sender, TextChangedEventArgs e)
+        {
+            var txt=(TextBox)sender;
+
+            var orginData = (MyKeyValue)txt.DataContext;
+
+            _imageMain.SetProperty(orginData.Key, txt.Text.Trim(), null, -1);
+
+        }
+
 
         private void _imageMain_OnSetProperty(string arg1, string arg2, System.Drawing.Rectangle? arg3)
         {

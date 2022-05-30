@@ -58,7 +58,7 @@
                                       Width="250" Height="100"
                                      Visibility="Visible" HorizontalScrollBarVisibility="Visible"
                                       VerticalScrollBarVisibility="Visible">
-                            <TextBlock Text="{Binding Path=Value}" TextWrapping="Wrap" ></TextBlock>
+                            <TextBox Text="{Binding Path=Value}" TextWrapping="Wrap" TextChanged="txtValueInListView_OnChange" ></TextBox>
                         </ScrollViewer>
                         
                     </Grid>

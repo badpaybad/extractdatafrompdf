@@ -192,60 +192,66 @@ namespace PdfExtractor.Domains
         {
             pageIdx = -1;
             box = null;
-
-            if (RatioResize <= 0) return string.Empty;
-
-            var template = MyAppContext.GetTemplate();
-
-            var minPage = template.CropArea.SelectMany(i => i.Value).Min(i => i.Key);
-            var maxPage = template.CropArea.SelectMany(i => i.Value).Max(i => i.Key);
-
             var text = string.Empty;
 
-            if (template.CropArea.TryGetValue(propName, out var value))
+            try
             {
-                var boxing = value.FirstOrDefault();
 
-                box = boxing.Value;
+                if (RatioResize <= 0) return string.Empty;
 
+                var template = MyAppContext.GetTemplate();
 
-                if (boxing.Key == minPage)
+                var minPage = template.CropArea.SelectMany(i => i.Value).Min(i => i.Key);
+                var maxPage = template.CropArea.SelectMany(i => i.Value).Max(i => i.Key);
+
+                if (template.CropArea.TryGetValue(propName, out var value))
                 {
-                    MyPdfPage? myPdfPage = Pages.FirstOrDefault();
+                    var boxing = value.FirstOrDefault();
 
-                    if (myPdfPage != null && myPdfPage.PageImage != null && box != null)
-                        text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box.Value));
+                    box = boxing.Value;
 
-                    //first page
-                    pageIdx = 1;
-                }
-                else if (boxing.Key == maxPage)
-                {
-                    MyPdfPage? myPdfPage = Pages.LastOrDefault();
 
-                    if (myPdfPage != null && myPdfPage.PageImage != null && box != null)
-                        text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box.Value));
-
-                    pageIdx = Pages.Count;
-                    //last page
-                }
-                else
-                {
-                    //page index
-                    pageIdx = boxing.Key;
-
-                    if (pageIdx > 0 && pageIdx < Pages.Count)
+                    if (boxing.Key == minPage)
                     {
-                        MyPdfPage? myPdfPage = Pages[pageIdx - 1];
+                        MyPdfPage? myPdfPage = Pages.FirstOrDefault();
 
                         if (myPdfPage != null && myPdfPage.PageImage != null && box != null)
                             text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box.Value));
 
+                        //first page
+                        pageIdx = 1;
                     }
+                    else if (boxing.Key == maxPage)
+                    {
+                        MyPdfPage? myPdfPage = Pages.LastOrDefault();
 
+                        if (myPdfPage != null && myPdfPage.PageImage != null && box != null)
+                            text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box.Value));
+
+                        pageIdx = Pages.Count;
+                        //last page
+                    }
+                    else
+                    {
+                        //page index
+                        pageIdx = boxing.Key;
+
+                        if (pageIdx > 0 && pageIdx < Pages.Count)
+                        {
+                            MyPdfPage? myPdfPage = Pages[pageIdx - 1];
+
+                            if (myPdfPage != null && myPdfPage.PageImage != null && box != null)
+                                text = new TesseractEngineWrapper().TryFindText(CropImage(myPdfPage.PageImage, box.Value));
+
+                        }
+
+                    }
                 }
             }
-
+            catch
+            {
+                //
+            }
             return text;
         }
 
