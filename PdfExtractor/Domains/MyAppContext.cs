@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using PdfExtractor.Test;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,8 +10,22 @@ using System.Threading.Tasks;
 
 namespace PdfExtractor.Domains
 {
-    internal static class MyAppContext
+    public static class MyAppContext
     {
+        private readonly static IServiceCollection serviceCollection = new ServiceCollection()
+           .AddScoped<TestDbContext>().AddSingleton<TestDomain>();
+
+        private readonly static IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+
+        public static IServiceProvider ServiceProvider { get { return serviceProvider; } }
+        public static IServiceCollection ServiceCollection
+        {
+            get
+            {
+                return serviceCollection;
+            }
+        }
+
         static MyAppContext()
         {
             List<string> filesTohide = new List<string>()
@@ -32,12 +48,6 @@ namespace PdfExtractor.Domains
             }
         }
 
-        public class TemplateCropImageText
-        {
-            public int RatioResize { get; set; }
-            public Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>> CropArea { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>>();
-        }
-
         static TemplateCropImageText? _template = null;
 
         public static TemplateCropImageText GetTemplate()
@@ -57,13 +67,6 @@ namespace PdfExtractor.Domains
         public static List<string> CurrentFiles { get; set; } = new List<string>();
 
         public static List<PdfToImageProcessing> CurrentFilesToProcess { get; set; } = new List<PdfToImageProcessing>();
-
-        public class LogedInfo
-        {
-            public string Uid { get; set; } = String.Empty;
-            public string Pwd { get; set; } = string.Empty;
-            public string AccessToken { get; set; } = string.Empty;
-        }
         public static void Logout()
         {
             try
@@ -299,60 +302,6 @@ namespace PdfExtractor.Domains
                 isSaving = false;
                 OnAutoSave?.Invoke(1);
             });
-        }
-
-        public class DataInfo
-        {
-            public DataInfo()
-            {
-                //
-            }
-
-            public DataInfo(PdfToImageProcessing src)
-            {
-                FilePdf = src.FilePdf;
-                FileName = src.FileName;
-                ParseStep = src.ParseStep;
-                UploadStateText = src.UploadStateText;
-                Pages = src.Pages;
-                PdfProperties = src.PdfProperties;
-                PdfPropertiesRegion = src.PdfPropertiesRegion;
-                ContextText = src.ContextText;
-                RatioResize = src.RatioResize;
-            }
-            public int RatioResize { get; set; }
-            public string FilePdf { get; set; } = String.Empty;
-            public int ParseStep { get; set; }
-            public string FileName { get; set; } = String.Empty;
-            public string UploadStateText { get; set; } = string.Empty;
-
-            public string ContextText { get; set; } = String.Empty;
-
-            [JsonIgnore]
-            public List<MyPdfPage> Pages { get; set; } = new List<MyPdfPage>();
-
-            public Dictionary<string, string> PdfProperties { get; set; } = new Dictionary<string, string>();
-            public Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>> PdfPropertiesRegion { get; set; } = new Dictionary<string, Dictionary<int, System.Drawing.Rectangle?>>();
-
-            public PdfToImageProcessing ToImageProcessing()
-            {
-                var filePdf = FilePdf;
-
-                var temp = new PdfToImageProcessing(filePdf)
-                {
-                    FileName = this.FileName,
-                    ParseStep = this.ParseStep,
-                    UploadStateText = this.UploadStateText,
-                    PdfProperties = this.PdfProperties,
-                    PdfPropertiesRegion = this.PdfPropertiesRegion,
-                    ContextText = this.ContextText,
-                    RatioResize = this.RatioResize,
-                };
-
-                ////temp.ConvertPagesImages();
-
-                return temp;
-            }
         }
     }
 }

@@ -82,7 +82,7 @@ namespace PdfExtractor
             {
                 if (_currentPdf == null || _currentPdf.RatioResize <= 0) return;
 
-                MyAppContext.SetAsTemplate(new MyAppContext.TemplateCropImageText
+                MyAppContext.SetAsTemplate(new TemplateCropImageText
                 {
                     RatioResize = _currentPdf.RatioResize,
                     CropArea = _currentPdf.PdfPropertiesRegion

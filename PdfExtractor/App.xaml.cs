@@ -1,4 +1,6 @@
-﻿using PdfExtractor.Domains;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PdfExtractor.Domains;
+using PdfExtractor.Test;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,15 +18,19 @@ namespace PdfExtractor
     /// </summary>
     public partial class App : Application
     {
+       
         protected override void OnStartup(StartupEventArgs e)
         {
+
+            Console.WriteLine("staring");
+
             base.OnStartup(e);
 
-            var testpdf = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "4.pdf");
+            // var testpdf = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "4.pdf");
 
-           var x= new PdfToImageProcessing(testpdf);
+            //var x= new PdfToImageProcessing(testpdf);
 
-            x.Parse();
+            // x.Parse();
 
             ////
 
