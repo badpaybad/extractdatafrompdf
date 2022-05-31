@@ -16,13 +16,28 @@ namespace PdfExtractor
     /// </summary>
     public partial class App : Application
     {
+
         protected override void OnStartup(StartupEventArgs e)
         {
+            this.DispatcherUnhandledException += (s, e) =>
+            {
+                if (e != null && e.Exception != null)
+                {
+                    Console.WriteLine(e.Exception.Message);
+                    Console.WriteLine(e.Exception.StackTrace);
+                }
+            };
+            AppDomain.CurrentDomain.UnhandledException += (s, e) => {
+                if (e != null && e.ExceptionObject != null)
+                {   
+                    Console.WriteLine(e.ExceptionObject);
+                }
+            };
             base.OnStartup(e);
 
             var testpdf = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "4.pdf");
 
-           var x= new PdfToImageProcessing(testpdf);
+            var x = new PdfToImageProcessing(testpdf);
 
             x.Parse();
 
