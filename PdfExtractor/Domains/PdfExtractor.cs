@@ -116,6 +116,23 @@ namespace PdfExtractor.Domains
         ///https://blog.aspose.com/2021/01/25/work-with-images-in-pdf-in-csharp/
         ////http://www.nullskull.com/q/10465415/read-image-text-from-pdf-file-to-itextsharp-in-aspnet-c.aspx
         ///
+
+        public async Task<List<Bitmap>> ConvertToImage(string pdfFullPath)
+        {
+            List<Bitmap> result = new List<Bitmap>();
+            await Task.Yield();
+            PdfDocument doc = new PdfDocument(new PdfReader(pdfFullPath));
+            int numOfPages = doc.GetNumberOfPages();
+            for (var i = 1; i <= numOfPages; i++)
+            {
+                var page = doc.GetPage(i);
+
+                result.Add(ConvertToBitmap(page));
+            }
+
+            return result;
+        }
+
         public async Task<List<MyPdfPage>> GetPageInfos(string pdfFullPath)
         {
             await Task.Yield();
@@ -123,6 +140,7 @@ namespace PdfExtractor.Domains
             {
                 ////https://livebook.manning.com/book/itext-in-action-second-edition/chapter-11/182
                 PdfDocument doc = new PdfDocument(new PdfReader(pdfFullPath));
+
 
                 ////PdfFont font = PdfFontFactory.CreateFont("Arial");
 

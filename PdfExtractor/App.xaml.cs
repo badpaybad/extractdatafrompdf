@@ -18,8 +18,10 @@ namespace PdfExtractor
     /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
+
+
             this.DispatcherUnhandledException += (s, e) =>
             {
                 if (e != null && e.Exception != null)
@@ -35,6 +37,12 @@ namespace PdfExtractor
                 }
             };
             base.OnStartup(e);
+
+            var pdf2img = new Domains.PdfToImage();
+
+           await pdf2img.Convert("c:/work/09-386.CN.pdf","C:/work");
+
+            Environment.Exit(0);
             
             // var testpdf = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "4.pdf");
 
