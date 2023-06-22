@@ -38,7 +38,7 @@ namespace PdfExtractor
             };
             base.OnStartup(e);
 
-            var pdf2img = new Domains.PdfToImage();
+            var pdf2img = new Domains.PdfToTextMrQuan();
 
            await pdf2img.Convert("c:/work/09-386.CN.pdf","C:/work");
 
