@@ -20,6 +20,7 @@ using PdfSharp.Pdf.IO;
 using PdfSharp.Drawing;
 using iText.IO.Image;
 using SkiaSharp;
+using System.Windows.Markup;
 
 
 namespace PdfExtractor.Domains
@@ -80,100 +81,165 @@ namespace PdfExtractor.Domains
         {
             await Task.Yield();
 
+            var a4w = 2482;
+            var a4h = 3508;
+
             var folderWordsInPage = Path.Combine(destDir, $"{pageIdx}");
 
-            if(Directory.Exists(folderWordsInPage)==false) { Directory.CreateDirectory(folderWordsInPage); }
+            if (Directory.Exists(folderWordsInPage) == false) { Directory.CreateDirectory(folderWordsInPage); }
 
-            List<string> textFoundInPage = new List<string>();
 
-            using (var image = new Image<Bgr, byte>(imagePath))
-            using (var gray = image.Convert<Gray, byte>())
+            using (var imageOrg = new Image<Bgr, byte>(imagePath))
             {
-                using (var canny = gray.Canny(100, 60))
-                using (var dilated = canny.Dilate(2))
-                using (var contours = new VectorOfVectorOfPoint())
+                a4h = (int)a4w * imageOrg.Height / imageOrg.Width;
+
+                if (imageOrg.Width > imageOrg.Height)
                 {
-                    CvInvoke.FindContours(dilated, contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                    a4w = 3508;
+                    a4h = (int)a4w * imageOrg.Height / imageOrg.Width;
+                }
+                //Image<Bgr, byte> image = new Image<Bgr, byte>(a4w, a4h);
+                //CvInvoke.Resize(imageOrg, image, new Size(a4w, a4h), 0, 0, Inter.Linear);
+                Image<Bgr, byte> image = imageOrg.Resize(a4w, a4h, Inter.Linear);
+                string outputImageResized = Path.Combine(destDir, $"{pageIdx}_resized.jpeg");
+                image.Save(outputImageResized);
+
+                using (var gray = image.Convert<Gray, byte>())
+                {
+                    //60px per line
+
+                    List<int> step = new List<int> { 0, 10, 20, 30 };
+                    var lineH = 70;
+                    for (var li = 0; li < image.Height; li = li + lineH)
+                    {
+
+                        List<string> textLine = new List<string>();
+
+                        foreach (var s in step)
+                        {
+                            try
+                            {
+                                Rectangle roi = new Rectangle(0, li + s, image.Width, lineH);
+                                Image<Bgr, byte> croppedImage = image.Copy(roi);
+                                var croppedImagePath = Path.Combine(folderWordsInPage, $"{li}_{s}_line.jpeg");
+                                croppedImage.Save(croppedImagePath);
+
+                                var ltext = img2textEngine.TryFindText(croppedImage.ToJpegData(),"vie");
+                                if (!string.IsNullOrEmpty(ltext))
+                                {
+                                    textLine.Add(ltext);
+                                }
+                            }
+                            catch { }
+                        }
+
+                        var filePageAllText = Path.Combine(folderWordsInPage, $"{li}_text.txt");
+
+                        using (var sw = new StreamWriter(filePageAllText, false,Encoding.UTF8))
+                        {
+                            var s = string.Join("\r\n", textLine);
+                            sw.Write(s);
+                            sw.Flush();
+                        }
+                    }
+
+
 
                     List<PointF[]> vectors = new List<PointF[]>();
 
-                    for (int i = 0; i < contours.Size; i++)
+                    using (var canny = gray.Canny(150, 50))
+                    using (var dilated = canny.Dilate(3))
+                    using (var contours = new VectorOfVectorOfPoint())
                     {
-                        try
+                        CvInvoke.FindContours(dilated, contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+
+                        for (int i = 0; i < contours.Size; i++)
                         {
-
-                            using (var contour = contours[i])
+                            try
                             {
-                                var box = CvInvoke.MinAreaRect(contour);
-
-                                if (box.Size.Height < 10 || box.Size.Width < 10)
-                                    continue;
-
-                                if (box.Size.Height > 200)
-                                    continue;
-
-                                PointF[] vertices = box.GetVertices();
-
-                                vectors.Add(vertices);
-
-                                var pTopLeft = vertices[0];
-                                var pBottomRight = vertices[2];
-                                var x = (int)pTopLeft.X;
-                                var y = (int)pTopLeft.Y;
-                                var w = (int)(pBottomRight.X - pTopLeft.X);
-                                var h = (int)(pBottomRight.Y - pTopLeft.Y);
-                                var xdelta = w / 4;
-                                var ydelta = h / 4;
-                              
-                                // Define the region of interest (ROI) for cropping
-                                Rectangle roi = new Rectangle(x-xdelta, y-ydelta, w+xdelta, h+ydelta);
-                                // Replace with the desired ROI coordinates and dimensions
-                                // Crop the image using the ROI
-                                Image<Bgr, byte> croppedImage = image.Copy(roi);
-                                // Save the cropped image
-
-                                var text = img2textEngine.TryFindText(croppedImage.ToJpegData());
-                                if (!string.IsNullOrEmpty(text))
+                                using (var contour = contours[i])
                                 {
-                                    textFoundInPage.Add(text);
+                                    var box = CvInvoke.MinAreaRect(contour);
+
+                                    if (box.Size.Height < 10 || box.Size.Width < 10)
+                                        continue;
+
+                                    if (box.Size.Height > 200)
+                                        continue;
+
+                                    PointF[] vertices = box.GetVertices();
+
+                                    vectors.Add(vertices);
                                 }
-                                var croppedImagePath = Path.Combine(folderWordsInPage, $"{i}.jpeg");
-                                croppedImage.Save(croppedImagePath);                             
 
                             }
+                            catch (Exception e) { }
 
-                            foreach(var vertices in vectors)
-                            {
-                                for (int j = 0; j < 4; j++)
-                                {
-                                    CvInvoke.Line(image, Point.Round(vertices[j]), Point.Round(vertices[(j + 1) % 4]), new Bgr(Color.Red).MCvScalar, 2);
-
-                                    //Rectangle bword = new Rectangle(x - xdelta, y + ydelta, x + xdelta, h - ydelta);
-                                    //MCvScalar fillColor = new MCvScalar(0, 0, 0);
-                                    //CvInvoke.Rectangle(image, bword, fillColor, -1);
-                                }
-                            }
                         }
-                        catch (Exception e) { }
-
                     }
+
+                    //for (int i = 0; i < vectors.Count; i++)
+                    //{
+
+                    //    PointF[]? vertices = vectors[i];
+                    //    var pTopLeft = vertices[0];
+                    //    var pBottomRight = vertices[2];
+                    //    var x = (int)pTopLeft.X;
+                    //    var y = (int)pTopLeft.Y;
+                    //    var w = (int)(pBottomRight.X - pTopLeft.X);
+                    //    var h = (int)(pBottomRight.Y - pTopLeft.Y);
+                    //    var xdelta = w / 4;
+                    //    var ydelta = h / 4;
+                    //    try
+                    //    {
+
+                    //        // Define the region of interest (ROI) for cropping
+                    //        Rectangle roi = new Rectangle(x - xdelta, y - ydelta, w + xdelta, h + ydelta);
+                    //        // Replace with the desired ROI coordinates and dimensions
+                    //        // Crop the image using the ROI
+                    //        Image<Bgr, byte> croppedImage = image.Copy(roi);
+                    //        // Save the cropped image
+
+                    //        var text = img2textEngine.TryFindText(croppedImage.ToJpegData(),"vie");
+                    //        if (!string.IsNullOrEmpty(text))
+                    //        {
+                    //            textFoundInPage.Add(text);
+                    //        }
+                    //        var croppedImagePath = Path.Combine(folderWordsInPage, $"{i}.jpeg");
+                    //        croppedImage.Save(croppedImagePath);
+                    //    }catch (Exception ex)
+                    //    {
+                    //        Console.WriteLine($"{x},{y},{w},{h}");
+                    //    }
+                    //}
+
+                    foreach (var vertices in vectors)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
+                            CvInvoke.Line(image, Point.Round(vertices[j]), Point.Round(vertices[(j + 1) % 4]), new Bgr(Color.Red).MCvScalar, 2);
+
+                            //Rectangle bword = new Rectangle(x - xdelta, y + ydelta, x + xdelta, h - ydelta);
+                            //MCvScalar fillColor = new MCvScalar(0, 0, 0);
+                            //CvInvoke.Rectangle(image, bword, fillColor, -1);
+                        }
+                    }
+                    // Save the image with detected word boxes
+
+                    // Example: Save the image with bounding boxes (optional)
+                    string outputImagePath = Path.Combine(destDir, $"{pageIdx}_boxed.jpeg");
+                    image.Save(outputImagePath);
                 }
 
-                // Save the image with detected word boxes
-
-                // Example: Save the image with bounding boxes (optional)
-                string outputImagePath = Path.Combine(destDir, $"{pageIdx}_boxed.jpeg");
-                image.Save(outputImagePath);
             }
+            //var filePageAllText = Path.Combine(destDir, $"{pageIdx}.txt");
 
-            var filePageAllText = Path.Combine(destDir, $"{pageIdx}.txt");
-
-            using (var sw = new StreamWriter(filePageAllText, false))
-            {
-                var s = string.Join(" ", textFoundInPage);
-                sw.Write(s);
-                sw.Flush();
-            }
+            //using (var sw = new StreamWriter(filePageAllText, false, Encoding.UTF8))
+            //{
+            //    var s = string.Join(" ", textFoundInPage);
+            //    sw.Write(s);
+            //    sw.Flush();
+            //}
         }
 
         public async Task BoxingCharTextInPage(string imagePath, int pageIdx, string destDir)
@@ -231,7 +297,7 @@ namespace PdfExtractor.Domains
                         // Access the recognized text (optional)
                         var fileText = Path.Combine(destDir, $"{pageIdx}.txt");
                         string recognizedText = img2textEngine.TryFindText(croppedImage.ToJpegData(), "vie");
-                        using (var sw = new StreamWriter(fileText, false))
+                        using (var sw = new StreamWriter(fileText, false, Encoding.UTF8))
                         {
                             sw.Write(recognizedText);
                             sw.Flush();
