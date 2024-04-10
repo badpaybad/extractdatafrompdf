@@ -333,7 +333,7 @@ namespace PdfExtractor.Domains
                 return false;
             }
         }
-        public static bool OmtDecript(this string encrypted, string password, out string decrypted)
+        public static bool StrDecript(this string encrypted, string password, out string decrypted)
         {
             decrypted = encrypted;
             try
@@ -347,7 +347,7 @@ namespace PdfExtractor.Domains
             }
             catch (Exception ex)
             {
-                Console.WriteLine("OmtDecript");
+                Console.WriteLine("StrDecript");
                 Console.WriteLine(ex);
                 return false;
             }

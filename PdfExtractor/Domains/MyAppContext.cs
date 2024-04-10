@@ -106,7 +106,7 @@ namespace PdfExtractor.Domains
                 temp = sr.ReadToEnd().Trim(new char[] { ' ', '\r', '\n' });
             }
 
-            StringCipher.OmtDecript(temp, "Du@2022", out var decrypted);
+            StringCipher.StrDecript(temp, "Du@2022", out var decrypted);
 
             Token = JsonConvert.DeserializeObject<LogedInfo>(decrypted);
 
